@@ -1,5 +1,5 @@
 
-# Kung-Fig Ref
+# Kung-Fig Expression
 
-Ref objects (variable) for [Kung Fig](https://github.com/cronvel/kung-fig).
+Expression objects for [Kung Fig](https://github.com/cronvel/kung-fig).
 
