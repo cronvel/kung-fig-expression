@@ -1099,6 +1099,30 @@ describe( "Expression" , function() {
 	
 	
 	
+	describe( "Stringify" , function() {
+		
+		it( "stringify a simple expression" , function() {
+			doormen.equals( Expression.parse( '1 + 2' ).stringify() , '1 + 2' ) ;
+			doormen.equals( Expression.parse( 'add 1 2' ).stringify() , '1 + 2' ) ;
+			doormen.equals( Expression.parse( 'add 1 2 3' ).stringify() , '1 + 2 + 3' ) ;
+			doormen.equals( Expression.parse( 'max 1 2 3' ).stringify() , 'max 1 , 2 , 3' ) ;
+			doormen.equals( Expression.parse( '- 1' ).stringify() , '- 1' ) ;
+			doormen.equals( Expression.parse( '$my.var - 1' ).stringify() , '$my.var - 1' ) ;
+			doormen.equals( Expression.parse( '! $my.var' ).stringify() , '! $my.var' ) ;
+			doormen.equals( Expression.parse( '$my.var is-real?' ).stringify() , '$my.var is-real?' ) ;
+			doormen.equals( Expression.parse( '"some" . "concat" . "string"' ).stringify() , '"some" . "concat" . "string"' ) ;
+			doormen.equals( Expression.parse( '"key1": "value1"' ).stringify() , '"key1": "value1"' ) ;
+			doormen.equals( Expression.parse( '"key1": "value1" "key2": "value2"' ).stringify() , '"key1": "value1" , "key2": "value2"' ) ;
+		} ) ;
+		
+		it( "stringify an expression with sub-expression" , function() {
+			doormen.equals( Expression.parse( '1 + ( 2 * 3 )' ).stringify() , '1 + ( 2 * 3 )' ) ;
+			doormen.equals( Expression.parse( '1 + ( 2 * ( exp 3 ) )' ).stringify() , '1 + ( 2 * ( exp 3 ) )' ) ;
+		} ) ;
+	} ) ;
+	
+	
+	
 	describe( "Historical bugs" , function() {
 		
 		// may check object multi-reference too
