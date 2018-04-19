@@ -415,6 +415,25 @@ describe( "Expression" , function() {
 			doormen.equals( parsed.getFinalValue() , 0 ) ;
 		} ) ;
 		
+		it( "zzz parse/exec the greater than '>' operator" , function() {
+			var parsed ;
+			
+			parsed = Expression.parse( '3 > 4' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '3 > 3' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '4 > 3' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '4 > 3 > 2' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '4 > 2 > 3' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+		} ) ;
+		
 		it( "parse/exec the 'and' operator" , function() {
 			var parsed ;
 			
