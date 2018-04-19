@@ -415,7 +415,7 @@ describe( "Expression" , function() {
 			doormen.equals( parsed.getFinalValue() , 0 ) ;
 		} ) ;
 		
-		it( "zzz parse/exec the greater than '>' operator" , function() {
+		it( "parse/exec the greater than '>' operator" , function() {
 			var parsed ;
 			
 			parsed = Expression.parse( '3 > 4' ) ;
@@ -432,6 +432,126 @@ describe( "Expression" , function() {
 			
 			parsed = Expression.parse( '4 > 2 > 3' ) ;
 			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '4 > 4 > 3' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '6 > 4 > 3 > 1' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+		} ) ;
+		
+		it( "parse/exec the greater than '>=' operator" , function() {
+			var parsed ;
+			
+			parsed = Expression.parse( '3 >= 4' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '3 >= 3' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '4 >= 3' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '4 >= 3 >= 2' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '4 >= 2 >= 3' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '4 >= 4 >= 3' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '6 >= 4 >= 3 >= 1' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+		} ) ;
+		
+		it( "parse/exec the greater than '<' operator" , function() {
+			var parsed ;
+			
+			parsed = Expression.parse( '3 < 4' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '3 < 3' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '4 < 3' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '2 < 3 < 4' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '3 < 2 < 4' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '3 < 4 < 4' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '1 < 3 < 4 < 5' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+		} ) ;
+		
+		it( "parse/exec the greater than '<=' operator" , function() {
+			var parsed ;
+			
+			parsed = Expression.parse( '3 <= 4' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '3 <= 3' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '4 <= 3' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '2 <= 3 <= 4' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '3 <= 2 <= 4' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '3 <= 4 <= 4' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '1 <= 4 <= 6 <= 7' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+		} ) ;
+		
+		it( "parse/exec the greater than '=' operator" , function() {
+			var parsed ;
+			
+			parsed = Expression.parse( '3 = 4' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '3 = 3' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '3 = 3 = 4' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '3 = 3 = 3' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+		} ) ;
+		
+		it( "parse/exec the greater than '!=' operator" , function() {
+			var parsed ;
+			
+			parsed = Expression.parse( '3 != 4' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '3 != 3' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			// Not much sens, but well...
+			parsed = Expression.parse( '3 != 3 != 4' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '3 != 3 != 3' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
+			parsed = Expression.parse( '4 != 3 != 5' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
+			
+			parsed = Expression.parse( '4 != 3 != 4' ) ;
+			doormen.equals( parsed.getFinalValue() , true ) ;
 		} ) ;
 		
 		it( "parse/exec the 'and' operator" , function() {
@@ -906,6 +1026,29 @@ describe( "Expression" , function() {
 			
 			parsed = Expression.parse( '( 1 / 0 ) is-real? "real" "not-real"' ) ;
 			doormen.equals( parsed.getFinalValue() , "not-real" ) ;
+		} ) ;
+		
+		it( "parse/exec the 'pi'/π constant" , function() {
+			var parsed ;
+			
+			parsed = Expression.parse( 'π' ) ;
+			doormen.equals( parsed , Math.PI ) ;
+			
+			parsed = Expression.parse( 'π + 0' ) ;
+			doormen.equals( parsed.getFinalValue() , Math.PI ) ;
+			
+			parsed = Expression.parse( 'pi + 0' ) ;
+			doormen.equals( parsed.getFinalValue() , Math.PI ) ;
+		} ) ;
+		
+		it( "parse/exec the 'e' constant" , function() {
+			var parsed ;
+			
+			parsed = Expression.parse( 'e' ) ;
+			doormen.equals( parsed , Math.E ) ;
+			
+			parsed = Expression.parse( 'e + 0' ) ;
+			doormen.equals( parsed.getFinalValue() , Math.E ) ;
 		} ) ;
 		
 		it( "parse/exec apply operator" , function() {
