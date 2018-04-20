@@ -67,6 +67,12 @@ describe( "Expression" , function() {
 			parsed = Expression.parse( 'true && true' ) ;
 			doormen.equals( parsed.getFinalValue() , true ) ;
 			
+			parsed = Expression.parse( 'null && true' ) ;
+			doormen.equals( parsed.getFinalValue() , null ) ;
+			
+			parsed = Expression.parse( 'null || false' ) ;
+			doormen.equals( parsed.getFinalValue() , false ) ;
+			
 			parsed = Expression.parse( 'true && false' ) ;
 			doormen.equals( parsed.getFinalValue() , false ) ;
 			
@@ -1102,6 +1108,12 @@ describe( "Expression" , function() {
 	describe( "Stringify" , function() {
 		
 		it( "stringify a simple expression" , function() {
+			doormen.equals( Expression.parse( 'true && true' ).stringify() , 'true && true' ) ;
+			doormen.equals( Expression.parse( 'true || false' ).stringify() , 'true || false' ) ;
+			doormen.equals( Expression.parse( 'null and false' ).stringify() , 'null and false' ) ;
+			doormen.equals( Expression.parse( 'NaN or Infinity' ).stringify() , 'NaN or Infinity' ) ;
+			doormen.equals( Expression.parse( 'Infinity or -Infinity' ).stringify() , 'Infinity or -Infinity' ) ;
+			doormen.equals( Expression.parse( '( e * pi ) + phi' ).stringify() , '( e * pi ) + phi' ) ;
 			doormen.equals( Expression.parse( '1 + 2' ).stringify() , '1 + 2' ) ;
 			doormen.equals( Expression.parse( 'add 1 2' ).stringify() , '1 + 2' ) ;
 			doormen.equals( Expression.parse( 'add 1 2 3' ).stringify() , '1 + 2 + 3' ) ;
