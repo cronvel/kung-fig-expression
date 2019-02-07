@@ -1,7 +1,7 @@
 /*
 	Kung Fig Expression
 
-	Copyright (c) 2015 - 2018 Cédric Ronvel
+	Copyright (c) 2015 - 2019 Cédric Ronvel
 
 	The MIT License (MIT)
 
@@ -35,12 +35,12 @@ const Expression = require( '..' ) ;
 
 
 
+/*
 const string = require( 'string-kit' ) ;
 function deb( v ) {
 	console.log( string.inspect( { style: 'color' , depth: 15 , funcDetails: true } , v ) ) ;
 }
 
-/*
 function debfn( v ) {
 	console.log( string.inspect( { style: 'color' , depth: 5 , proto: true , funcDetails: true } , v ) ) ;
 }
@@ -49,63 +49,6 @@ function debfn( v ) {
 
 
 describe( "Expression" , () => {
-
-	describe( "zzz New syntax" , () => {
-
-		it( "base" , () => {
-			var parsed ;
-			
-			parsed = Expression.parse( '1 + 2' ) ;
-			deb( parsed ) ;
-			expect( parsed.getFinalValue() ).to.equal( 3 ) ;
-			
-			parsed = Expression.parse( '1' ) ;
-			deb( parsed ) ;
-			expect( parsed ).to.be( 1 ) ;
-			
-			parsed = Expression.parse( '1 , 2 , 3' ) ;
-			deb( parsed ) ;
-			expect( parsed ).to.be( 1 ) ;
-			
-			parsed = Expression.parse( '( 1 , 2 , 3 )' ) ;
-			deb( parsed ) ;
-			expect( parsed ).to.equal( 1 ) ;
-
-			parsed = Expression.parse( '1 + ( 2 * 3 )' ) ;
-			deb( parsed ) ;
-			expect( parsed.getFinalValue() ).to.equal( 7 ) ;
-
-			parsed = Expression.parse( '1 + 2 , 3 , 4' ) ;
-			deb( parsed ) ;
-			expect( parsed.getFinalValue() ).to.equal( 3 ) ;
-
-			parsed = Expression.parse( 'add ( 1 , 2 , 3 , 4 )' ) ;
-			deb( parsed ) ;
-			expect( parsed.getFinalValue() ).to.equal( 10 ) ;
-
-			parsed = Expression.parse( 'add ( 1 , 2 * 3 , 4 )' ) ;
-			deb( parsed ) ;
-			expect( parsed.getFinalValue() ).to.equal( 11 ) ;
-
-			parsed = Expression.parse( 'add ( 1 , 2 * 3 , 4 / 2 )' ) ;
-			deb( parsed ) ;
-			expect( parsed.getFinalValue() ).to.equal( 9 ) ;
-		} ) ;
-		
-		/*
-		it( "1" , () => {
-			var parsed ;
-			parsed = Expression.parse( '1 + 2 , 2 / 3 , 7 * 2' ) ;
-			expect( parsed.getFinalValue() ).to.equal( [ 3 , 2/3 , 14 ] ) ;
-		} ) ;
-
-		it( "2" , () => {
-			var parsed ;
-			parsed = Expression.parse( '( ceil 1.2 , floor 1.2 )' ) ;
-			expect( parsed.getFinalValue() ).to.equal( [ 2 , 1 ] ) ;
-		} ) ;
-		*/
-	} ) ;
 
 	describe( "Syntax" , () => {
 
@@ -233,6 +176,9 @@ describe( "Expression" , () => {
 
 		it( "parse/exec an expression with the object syntax" , () => {
 			var parsed ;
+
+			parsed = Expression.parse( '{}' ) ;
+			expect( parsed.getFinalValue() ).to.equal( {} ) ;
 
 			parsed = Expression.parse( '{ "key" : "value" }' ) ;
 			expect( parsed.getFinalValue() ).to.equal( { key: 'value' } ) ;
@@ -1133,19 +1079,23 @@ describe( "Expression" , () => {
 			expect( Expression.parse( '1 + 2' ).stringify() ).to.be( '1 + 2' ) ;
 			expect( Expression.parse( 'add 1 2' ).stringify() ).to.be( '1 + 2' ) ;
 			expect( Expression.parse( 'add 1 2 3' ).stringify() ).to.be( '1 + 2 + 3' ) ;
-			expect( Expression.parse( 'max 1 2 3' ).stringify() ).to.be( 'max 1 , 2 , 3' ) ;
+			expect( Expression.parse( 'max 1 2 3' ).stringify() ).to.be( 'max( 1 , 2 , 3 )' ) ;
 			expect( Expression.parse( '- 1' ).stringify() ).to.be( '- 1' ) ;
 			expect( Expression.parse( '$my.var - 1' ).stringify() ).to.be( '$my.var - 1' ) ;
 			expect( Expression.parse( '! $my.var' ).stringify() ).to.be( '! $my.var' ) ;
 			expect( Expression.parse( '$my.var is-real?' ).stringify() ).to.be( '$my.var is-real?' ) ;
 			expect( Expression.parse( '"some" . "concat" . "string"' ).stringify() ).to.be( '"some" . "concat" . "string"' ) ;
-			expect( Expression.parse( '"key1": "value1"' ).stringify() ).to.be( '"key1": "value1"' ) ;
-			expect( Expression.parse( '"key1": "value1" "key2": "value2"' ).stringify() ).to.be( '"key1": "value1" , "key2": "value2"' ) ;
+			expect( Expression.parse( '[]' ).stringify() ).to.be( '[]' ) ;
+			expect( Expression.parse( '[ "value1" ]' ).stringify() ).to.be( '[ "value1" ]' ) ;
+			expect( Expression.parse( '[ "value1" , "value2" ]' ).stringify() ).to.be( '[ "value1" , "value2" ]' ) ;
+			expect( Expression.parse( '{}' ).stringify() ).to.be( '{}' ) ;
+			expect( Expression.parse( '{ "key1": "value1" }' ).stringify() ).to.be( '{ "key1": "value1" }' ) ;
+			expect( Expression.parse( '{ "key1": "value1" , "key2": "value2" }' ).stringify() ).to.be( '{ "key1": "value1" , "key2": "value2" }' ) ;
 		} ) ;
 
 		it( "stringify an expression with sub-expression" , () => {
 			expect( Expression.parse( '1 + ( 2 * 3 )' ).stringify() ).to.be( '1 + ( 2 * 3 )' ) ;
-			expect( Expression.parse( '1 + ( 2 * ( exp 3 ) )' ).stringify() ).to.be( '1 + ( 2 * ( exp 3 ) )' ) ;
+			expect( Expression.parse( '1 + ( 2 * ( exp 3 ) )' ).stringify() ).to.be( '1 + ( 2 * ( exp( 3 ) ) )' ) ;
 		} ) ;
 	} ) ;
 
@@ -1171,6 +1121,47 @@ describe( "Expression" , () => {
 		it( "extra spaces parse bug" , () => {
 			var parsed = Expression.parse( '0 ? ' ) ;
 		} ) ;
+
+		it( "new syntax" , () => {
+			var parsed ;
+			
+			parsed = Expression.parse( '1 + 2' ) ;
+			//deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 3 ) ;
+			
+			parsed = Expression.parse( '1' ) ;
+			//deb( parsed ) ;
+			expect( parsed ).to.be( 1 ) ;
+			
+			parsed = Expression.parse( '1 , 2 , 3' ) ;
+			//deb( parsed ) ;
+			expect( parsed ).to.be( 1 ) ;
+			
+			parsed = Expression.parse( '( 1 , 2 , 3 )' ) ;
+			//deb( parsed ) ;
+			expect( parsed ).to.equal( 1 ) ;
+
+			parsed = Expression.parse( '1 + ( 2 * 3 )' ) ;
+			//deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 7 ) ;
+
+			parsed = Expression.parse( '1 + 2 , 3 , 4' ) ;
+			//deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 3 ) ;
+
+			parsed = Expression.parse( 'add ( 1 , 2 , 3 , 4 )' ) ;
+			//deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 10 ) ;
+
+			parsed = Expression.parse( 'add ( 1 , 2 * 3 , 4 )' ) ;
+			//deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 11 ) ;
+
+			parsed = Expression.parse( 'add ( 1 , 2 * 3 , 4 / 2 )' ) ;
+			//deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 9 ) ;
+		} ) ;
+		
 	} ) ;
 } ) ;
 
