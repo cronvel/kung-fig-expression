@@ -30,18 +30,18 @@
 
 
 
-var Expression = require( '..' ) ;
+const Expression = require( '..' ) ;
+//const Dynamic = require( 'kung-fig-dynamic' ) ;
 
 
 
-/*
-function deb( v )
-{
-	console.log( string.inspect( { style: 'color' , depth: 15 } , v ) ) ;
+const string = require( 'string-kit' ) ;
+function deb( v ) {
+	console.log( string.inspect( { style: 'color' , depth: 15 , funcDetails: true } , v ) ) ;
 }
 
-function debfn( v )
-{
+/*
+function debfn( v ) {
 	console.log( string.inspect( { style: 'color' , depth: 5 , proto: true , funcDetails: true } , v ) ) ;
 }
 */
@@ -49,6 +49,63 @@ function debfn( v )
 
 
 describe( "Expression" , () => {
+
+	describe( "zzz New syntax" , () => {
+
+		it( "base" , () => {
+			var parsed ;
+			
+			parsed = Expression.parse( '1 + 2' ) ;
+			deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 3 ) ;
+			
+			parsed = Expression.parse( '1' ) ;
+			deb( parsed ) ;
+			expect( parsed ).to.be( 1 ) ;
+			
+			parsed = Expression.parse( '1 , 2 , 3' ) ;
+			deb( parsed ) ;
+			expect( parsed ).to.be( 1 ) ;
+			
+			parsed = Expression.parse( '( 1 , 2 , 3 )' ) ;
+			deb( parsed ) ;
+			expect( parsed ).to.equal( 1 ) ;
+
+			parsed = Expression.parse( '1 + ( 2 * 3 )' ) ;
+			deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 7 ) ;
+
+			parsed = Expression.parse( '1 + 2 , 3 , 4' ) ;
+			deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 3 ) ;
+
+			parsed = Expression.parse( 'add ( 1 , 2 , 3 , 4 )' ) ;
+			deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 10 ) ;
+
+			parsed = Expression.parse( 'add ( 1 , 2 * 3 , 4 )' ) ;
+			deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 11 ) ;
+
+			parsed = Expression.parse( 'add ( 1 , 2 * 3 , 4 / 2 )' ) ;
+			deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 9 ) ;
+		} ) ;
+		
+		/*
+		it( "1" , () => {
+			var parsed ;
+			parsed = Expression.parse( '1 + 2 , 2 / 3 , 7 * 2' ) ;
+			expect( parsed.getFinalValue() ).to.equal( [ 3 , 2/3 , 14 ] ) ;
+		} ) ;
+
+		it( "2" , () => {
+			var parsed ;
+			parsed = Expression.parse( '( ceil 1.2 , floor 1.2 )' ) ;
+			expect( parsed.getFinalValue() ).to.equal( [ 2 , 1 ] ) ;
+		} ) ;
+		*/
+	} ) ;
 
 	describe( "Syntax" , () => {
 
@@ -105,17 +162,7 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( 2 ) ;
 		} ) ;
 
-		it( "parse/exec an expression with implicit array creation" , () => {
-			var parsed ;
-
-			parsed = Expression.parse( '1 2 3' ) ;
-			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
-
-			parsed = Expression.parse( '1 , 2 , 3' ) ;
-			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
-		} ) ;
-
-		it( "parse/exec an expression with explicit array creation" , () => {
+		it( "parse/exec an expression with explicit array operator" , () => {
 			var parsed ;
 
 			parsed = Expression.parse( 'array' ) ;
@@ -130,9 +177,50 @@ describe( "Expression" , () => {
 			expect( parsed.args ).to.equal( [ 1 , 2 , 3 ] ) ;
 			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
 
-			parsed = Expression.parse( 'array 1 , 2 , 3' ) ;
+			parsed = Expression.parse( 'array ( 1 , 2 , 3 )' ) ;
 			expect( parsed.args ).to.equal( [ 1 , 2 , 3 ] ) ;
 			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
+		} ) ;
+
+		it( "parse/exec an expression with the array syntax" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( '[]' ) ;
+			expect( parsed.args ).to.be.like( [] ) ;
+			expect( parsed.getFinalValue() ).to.equal( [] ) ;
+
+			parsed = Expression.parse( '[ 1 ]' ) ;
+			expect( parsed.args ).to.be.like( [ 1 ] ) ;
+			expect( parsed.getFinalValue() ).to.equal( [ 1 ] ) ;
+
+			parsed = Expression.parse( '[ 1 , 2 ]' ) ;
+			expect( parsed.args ).to.be.like( [ 1 , 2 ] ) ;
+			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 ] ) ;
+
+			parsed = Expression.parse( '[ 1 , 2 , 3 ]' ) ;
+			expect( parsed.args ).to.be.like( [ 1 , 2 , 3 ] ) ;
+			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
+
+			parsed = Expression.parse( '[1,2,3]' ) ;
+			expect( parsed.args ).to.be.like( [ 1 , 2 , 3 ] ) ;
+			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
+		} ) ;
+
+		it( "parse/exec an expression with explicit object operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( 'object key: "value"' ) ;
+			//console.log( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( { key: 'value' } ) ;
+
+			parsed = Expression.parse( 'key1: "value1", key2: 2' ) ;
+			//parsed = Expression.parse( 'key1: "value1", key2: 2' ) ;
+			//console.log( '\n\n' , parsed ) ;
+
+			parsed = Expression.parse( 'object( key1: "value1", key2: 2 )' ) ;
+			//parsed = Expression.parse( 'key1: "value1", key2: 2' ) ;
+			//console.log( '\n\n' , parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( { key1: 'value1' , key2: 2 } ) ;
 		} ) ;
 
 		it( "parse/exec an expression with implicit object creation" , () => {
@@ -167,18 +255,6 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.equal( { key1: 'value1' , key2: 2 } ) ;
 		} ) ;
 
-		it( "object syntax: comma/colon precedence" , () => {
-			var parsed ;
-
-			parsed = Expression.parse( 'key1: "value1" , key2: 2' ) ;
-			//console.log( parsed ) ;
-			expect( parsed.getFinalValue() ).to.equal( { key1: 'value1' , key2: 2 } ) ;
-
-			parsed = Expression.parse( '"hello" , key1: "value1" , key2: 2' ) ;
-			//console.log( parsed ) ;
-			expect( parsed.getFinalValue() ).to.equal( [ "hello" , { key1: 'value1' } , { key2: 2 } ] ) ;
-		} ) ;
-
 		it( "object syntax: direct expression in property" , () => {
 			var parsed ;
 
@@ -189,23 +265,6 @@ describe( "Expression" , () => {
 			parsed = Expression.parse( 'key1: 2 + 3 , key2: 3 / 5' ) ;
 			//console.log( parsed ) ;
 			expect( parsed.getFinalValue() ).to.equal( { key1: 5 , key2: 0.6 } ) ;
-		} ) ;
-
-		it( "parse/exec an expression with explicit object creation" , () => {
-			var parsed ;
-
-			parsed = Expression.parse( 'object key: "value"' ) ;
-			//console.log( parsed ) ;
-			expect( parsed.getFinalValue() ).to.equal( { key: 'value' } ) ;
-
-			parsed = Expression.parse( 'key1: "value1", key2: 2' ) ;
-			//parsed = Expression.parse( 'key1: "value1", key2: 2' ) ;
-			//console.log( '\n\n' , parsed ) ;
-
-			parsed = Expression.parse( 'object key1: "value1", key2: 2' ) ;
-			//parsed = Expression.parse( 'key1: "value1", key2: 2' ) ;
-			//console.log( '\n\n' , parsed ) ;
-			expect( parsed.getFinalValue() ).to.equal( { key1: 'value1' , key2: 2 } ) ;
 		} ) ;
 
 		it( "ambiguous object syntax" , () => {
@@ -238,55 +297,55 @@ describe( "Expression" , () => {
 		it( "parse/exec an expression featuring the comma separator syntax" , () => {
 			var parsed ;
 
-			parsed = Expression.parse( 'add 1 , 2 , 3' ) ;
+			parsed = Expression.parse( 'add( 1 , 2 , 3 )' ) ;
 			expect( parsed.getFinalValue() ).to.be( 6 ) ;
 
-			parsed = Expression.parse( 'add 2 * 4 , 3' ) ;
+			parsed = Expression.parse( 'add( 2 * 4 , 3 )' ) ;
 			expect( parsed.getFinalValue() ).to.be( 11 ) ;
 
-			parsed = Expression.parse( 'add 2 , 4 * 2 , 3' ) ;
+			parsed = Expression.parse( 'add( 2 , 4 * 2 , 3 )' ) ;
 			expect( parsed.getFinalValue() ).to.be( 13 ) ;
 
-			parsed = Expression.parse( 'add 2 , 4 , 3 * 2' ) ;
+			parsed = Expression.parse( 'add( 2 , 4 , 3 * 2 )' ) ;
 			expect( parsed.getFinalValue() ).to.be( 12 ) ;
 
-			parsed = Expression.parse( 'add 2 * 4 , 3 * 5 , 2' ) ;
+			parsed = Expression.parse( 'add( 2 * 4 , 3 * 5 , 2 )' ) ;
 			expect( parsed.getFinalValue() ).to.be( 25 ) ;
 
-			parsed = Expression.parse( 'add 2 * 4 , 3 * 5' ) ;
+			parsed = Expression.parse( 'add( 2 * 4 , 3 * 5 )' ) ;
 			expect( parsed.getFinalValue() ).to.be( 23 ) ;
 
-			parsed = Expression.parse( 'add 1 , 2 * 4 , 3' ) ;
+			parsed = Expression.parse( 'add( 1 , 2 * 4 , 3 )' ) ;
 			expect( parsed.getFinalValue() ).to.be( 12 ) ;
 
-			parsed = Expression.parse( 'add 1 + 3 , 2 * 4 , 3 ^ 2' ) ;
+			parsed = Expression.parse( 'add( 1 + 3 , 2 * 4 , 3 ^ 2 )' ) ;
 			expect( parsed.getFinalValue() ).to.be( 21 ) ;
 		} ) ;
 
 		it( "optional spaces around commas" , () => {
 			var parsed ;
 
-			parsed = Expression.parse( '1 , 2 , 3' ) ;
+			parsed = Expression.parse( 'array(1 , 2 , 3)' ) ;
 			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
 
-			parsed = Expression.parse( '1 ,2 ,3' ) ;
+			parsed = Expression.parse( 'array(1 ,2 ,3)' ) ;
 			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
 
-			parsed = Expression.parse( '1, 2, 3' ) ;
+			parsed = Expression.parse( 'array(1, 2, 3)' ) ;
 			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
 
-			parsed = Expression.parse( '1,2,3' ) ;
+			parsed = Expression.parse( 'array(1,2,3)' ) ;
 			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
 
-			parsed = Expression.parse( '"one","two","three"' ) ;
+			parsed = Expression.parse( 'array("one","two","three")' ) ;
 			expect( parsed.getFinalValue() ).to.equal( [ "one" , "two" , "three" ] ) ;
 		} ) ;
 
 		it( "optional spaces around parenthesis" , () => {
 			var parsed ;
 
-			parsed = Expression.parse( '1(2,3)4' ) ;
-			expect( parsed.getFinalValue() ).to.equal( [ 1 , [ 2 , 3 ] , 4 ] ) ;
+			parsed = Expression.parse( 'array(1,2,3,4)5' ) ;
+			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 , 4 , 5 ] ) ;
 		} ) ;
 	} ) ;
 
