@@ -40,11 +40,7 @@ const string = require( 'string-kit' ) ;
 function deb( v ) {
 	console.log( string.inspect( { style: 'color' , depth: 15 , funcDetails: true } , v ) ) ;
 }
-
-function debfn( v ) {
-	console.log( string.inspect( { style: 'color' , depth: 5 , proto: true , funcDetails: true } , v ) ) ;
-}
-*/
+//*/
 
 
 
@@ -147,6 +143,12 @@ describe( "Expression" , () => {
 			parsed = Expression.parse( '[1,2,3]' ) ;
 			expect( parsed.args ).to.be.like( [ 1 , 2 , 3 ] ) ;
 			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
+
+			parsed = Expression.parse( '[ 1 , 2 + 3 , 4 * 5 ]' ) ;
+			expect( parsed.getFinalValue() ).to.equal( [ 1 , 5 , 20 ] ) ;
+
+			parsed = Expression.parse( '[ 1 , [[2 + 3]] ]' ) ;
+			expect( parsed.getFinalValue() ).to.equal( [ 1 , [[5]] ] ) ;
 		} ) ;
 
 		it( "parse/exec an expression with the explicit object operator" , () => {
@@ -1122,7 +1124,15 @@ describe( "Expression" , () => {
 			var parsed = Expression.parse( '0 ? ' ) ;
 		} ) ;
 
-		it( "new syntax" , () => {
+		it( "new syntax as of Kung-Fig v0.48" , () => {
+			var parsed ;
+			
+			parsed = Expression.parse( '1 + 2' ) ;
+			//deb( parsed ) ;
+			expect( parsed.getFinalValue() ).to.equal( 3 ) ;
+		} ) ;
+		
+		it( "new syntax as of Kung-Fig v0.47" , () => {
 			var parsed ;
 			
 			parsed = Expression.parse( '1 + 2' ) ;
