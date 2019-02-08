@@ -734,7 +734,8 @@ describe( "Expression" , () => {
 			parsed = Expression.parse( 'avg -4  10 27 3' ) ;
 			expect( parsed.getFinalValue() ).to.be( 9 ) ;
 
-			parsed = Expression.parse( 'avg $array' ) ;
+			// With the spread operator
+			parsed = Expression.parse( 'avg ( ... $array )' ) ;
 			expect( parsed.getFinalValue( ctx ) ).to.be( 4 ) ;
 		} ) ;
 
@@ -1021,6 +1022,31 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( Math.E ) ;
 		} ) ;
 
+		it( "parse/exec the spread operator" , () => {
+			var parsed , r ;
+
+			parsed = Expression.parse( '... [1,2,3]' ) ;
+			expect( parsed.getFinalValue() ).to.be.an( Expression.Stack ) ;
+			expect( parsed.getFinalValue() ).to.be.like( [1,2,3] ) ;
+
+			parsed = Expression.parse( '... {a:1,b:2,c:3}' ) ;
+			r = parsed.getFinalValue() ;
+			expect( r ).to.be.an( Expression.Stack ) ;
+			expect( r ).to.be.like( [['a',1],['b',2],['c',3]] ) ;
+			expect( r[ 0 ] ).to.be.an( Expression.ObjectEntry ) ;
+			expect( r[ 1 ] ).to.be.an( Expression.ObjectEntry ) ;
+			expect( r[ 2 ] ).to.be.an( Expression.ObjectEntry ) ;
+
+			parsed = Expression.parse( 'max( [1,2,3] )' ) ;
+			expect( parsed.getFinalValue() ).to.be( NaN ) ;
+			
+			parsed = Expression.parse( 'max( ... [1,2,3] )' ) ;
+			expect( parsed.getFinalValue() ).to.be( 3 ) ;
+			
+			parsed = Expression.parse( 'min( ... [1,2,3] )' ) ;
+			expect( parsed.getFinalValue() ).to.be( 1 ) ;
+		} ) ;
+
 		it( "parse/exec apply operator" , () => {
 			var parsed , ctx , object ;
 
@@ -1100,6 +1126,14 @@ describe( "Expression" , () => {
 			// 3 is ignored here
 			parsed = Expression.parse( 'avgD( dices: 2 , faces: 6 , 3 )' , operators ) ;
 			expect( parsed.getFinalValue() ).to.be( 7 ) ;
+
+			// Using the spread operator
+			var ctx = {
+				object: { base: 5 , dices: 2 , faces: 8 }
+			} ;
+			parsed = Expression.parse( 'avgD( ... $object )' , operators ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( 14 ) ;
+
 		} ) ;
 	} ) ;
 
