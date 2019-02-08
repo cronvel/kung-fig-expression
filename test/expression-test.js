@@ -1094,7 +1094,7 @@ describe( "Expression" , () => {
 			expect( Expression.parse( '{ "key1": "value1" }' ).stringify() ).to.be( '{ "key1": "value1" }' ) ;
 			expect( Expression.parse( '{ "key1": "value1" , "key2": "value2" }' ).stringify() ).to.be( '{ "key1": "value1" , "key2": "value2" }' ) ;
 		} ) ;
-
+		
 		it( "stringify an expression with sub-expression" , () => {
 			expect( Expression.parse( '1 + ( 2 * 3 )' ).stringify() ).to.be( '1 + ( 2 * 3 )' ) ;
 			expect( Expression.parse( '1 + ( 2 * ( exp 3 ) )' ).stringify() ).to.be( '1 + ( 2 * ( exp( 3 ) ) )' ) ;
@@ -1124,14 +1124,6 @@ describe( "Expression" , () => {
 			var parsed = Expression.parse( '0 ? ' ) ;
 		} ) ;
 
-		it( "new syntax as of Kung-Fig v0.48" , () => {
-			var parsed ;
-			
-			parsed = Expression.parse( '1 + 2' ) ;
-			//deb( parsed ) ;
-			expect( parsed.getFinalValue() ).to.equal( 3 ) ;
-		} ) ;
-		
 		it( "new syntax as of Kung-Fig v0.47" , () => {
 			var parsed ;
 			
