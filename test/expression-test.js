@@ -35,7 +35,7 @@ const Expression = require( '..' ) ;
 
 
 
-/*
+//*
 const string = require( 'string-kit' ) ;
 function deb( v ) {
 	console.log( string.inspect( { style: 'color' , depth: 15 , funcDetails: true } , v ) ) ;
@@ -1041,29 +1041,65 @@ describe( "Expression" , () => {
 		} ) ;
 
 		it( "parse/exec custom operator" , () => {
-			var parsed , ctx , operators , object , v ;
-
-			object = { a: 3 , b: 5 } ;
-			object.fn = function( v_ ) { return this.a * v_ + this.b ; } ;
-
-			ctx = {
-				fn: function( v_ ) { return v_ * 2 + 1 ; } ,
-				object: object
-			} ;
+			var parsed , operators , v ;
 
 			operators = {
-				D: function( args ) {
-					var sum = 0 , n = args[ 0 ] , faces = args[ 1 ] ;
-					for ( ; n > 0 ; n -- ) { sum += 1 + Math.floor( Math.random() * faces ) ; }
+				D: ( dices , faces ) => {
+					var sum = 0 ;
+					for ( ; dices > 0 ; dices -- ) { sum += 1 + Math.floor( Math.random() * faces ) ; }
 					return sum ;
 				}
 			} ;
 
 			parsed = Expression.parse( '3 D 6' , operators ) ;
 			//deb( parsed ) ;
-			v = parsed.getFinalValue( ctx ) ;
+			v = parsed.getFinalValue() ;
 			//deb( v ) ;
-			expect( v >= 1 && v <= 18 , true ) ;
+			expect( v ).to.be.within( 1 , 18 ) ;
+		} ) ;
+
+		it( "parse/exec custom operator with named parameters" , () => {
+			var parsed , operators , v ;
+
+			operators = {
+				avgD: ( ... args ) => {
+					var { base , dices , faces } = Expression.getNamedParameters( args , [ 'base' , 'dices' , 'faces' ] , { base: 0 , dices: 1 , faces: 4 } ) ;
+					//console.log( base , dices , faces ) ;
+					return base + ( dices + dices * faces ) / 2 ;
+				}
+			} ;
+
+			parsed = Expression.parse( 'avgD()' , operators ) ;
+			expect( parsed.getFinalValue() ).to.be( 2.5 ) ;
+
+			parsed = Expression.parse( 'avgD( 3 )' , operators ) ;
+			expect( parsed.getFinalValue() ).to.be( 5.5 ) ;
+
+			parsed = Expression.parse( 'avgD( 3 , 2 )' , operators ) ;
+			expect( parsed.getFinalValue() ).to.be( 8 ) ;
+
+			parsed = Expression.parse( 'avgD( 3 , 2 , 6 )' , operators ) ;
+			expect( parsed.getFinalValue() ).to.be( 10 ) ;
+
+			parsed = Expression.parse( 'avgD( 3 , 2 , faces: 6 )' , operators ) ;
+			expect( parsed.getFinalValue() ).to.be( 10 ) ;
+
+			parsed = Expression.parse( 'avgD( dices: 2 , faces: 6 )' , operators ) ;
+			expect( parsed.getFinalValue() ).to.be( 7 ) ;
+
+			parsed = Expression.parse( 'avgD( faces: 6 , dices: 2 , base: 3 )' , operators ) ;
+			expect( parsed.getFinalValue() ).to.be( 10 ) ;
+
+			parsed = Expression.parse( 'avgD( 3 , dices: 2 , faces: 6 )' , operators ) ;
+			expect( parsed.getFinalValue() ).to.be( 10 ) ;
+
+			// 3 is ignored here
+			parsed = Expression.parse( 'avgD( dices: 2 , 3 , faces: 6 )' , operators ) ;
+			expect( parsed.getFinalValue() ).to.be( 7 ) ;
+
+			// 3 is ignored here
+			parsed = Expression.parse( 'avgD( dices: 2 , faces: 6 , 3 )' , operators ) ;
+			expect( parsed.getFinalValue() ).to.be( 7 ) ;
 		} ) ;
 	} ) ;
 
@@ -1163,7 +1199,6 @@ describe( "Expression" , () => {
 			//deb( parsed ) ;
 			expect( parsed.getFinalValue() ).to.equal( 9 ) ;
 		} ) ;
-		
 	} ) ;
 } ) ;
 
