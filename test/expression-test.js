@@ -35,7 +35,7 @@ const Expression = require( '..' ) ;
 
 
 
-//*
+/*
 const string = require( 'string-kit' ) ;
 function deb( v ) {
 	console.log( string.inspect( { style: 'color' , depth: 15 , funcDetails: true } , v ) ) ;
