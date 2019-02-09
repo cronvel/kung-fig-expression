@@ -669,16 +669,16 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( false ) ;
 		} ) ;
 
-		it( "parse/exec . (dot) operator" , () => {
+		it( "parse/exec .. (double-dot) strcat operator" , () => {
 			var parsed ;
 
-			parsed = Expression.parse( '"one" . "two"' ) ;
+			parsed = Expression.parse( '"one" .. "two"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "onetwo" ) ;
 
-			parsed = Expression.parse( '"one" . "two" . "three"' ) ;
+			parsed = Expression.parse( '"one" .. "two" .. "three"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "onetwothree" ) ;
 
-			parsed = Expression.parse( 'false . "one" . 2 . "three" true' ) ;
+			parsed = Expression.parse( 'false .. "one" .. 2 .. "three" true' ) ;
 			expect( parsed.getFinalValue() ).to.be( "falseone2threetrue" ) ;
 		} ) ;
 
@@ -1020,6 +1020,50 @@ describe( "Expression" , () => {
 
 			parsed = Expression.parse( 'e + 0' ) ;
 			expect( parsed.getFinalValue() ).to.be( Math.E ) ;
+		} ) ;
+
+		it( "parse/exec . (dot) navigation operator" , () => {
+			var parsed ;
+			
+			var ctx = {
+				object: {
+					path: { to: { nested: { property: "value" } } }
+				} ,
+				array: [ 0 , [ [ 1 , [ [ 2 ] ] ] ] ]
+			} ;
+
+			parsed = Expression.parse( '$object . "path"' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( ctx.object.path ) ;
+
+			parsed = Expression.parse( '$object . "path" . "to"' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( ctx.object.path.to ) ;
+
+			parsed = Expression.parse( '$object . "path" . "to" . "nested"' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( ctx.object.path.to.nested ) ;
+
+			parsed = Expression.parse( '$object . "path" . "to" . "nested" . "property"' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( "value" ) ;
+
+			parsed = Expression.parse( '$object . "path" . "to" . ( "nest" .. "ed" ) . "property"' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( "value" ) ;
+
+			parsed = Expression.parse( '$array . 0' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( 0 ) ;
+
+			parsed = Expression.parse( '$array . 1' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( ctx.array[ 1 ] ) ;
+
+			parsed = Expression.parse( '$array . 1 . 0 . 0' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( 1 ) ;
+
+			parsed = Expression.parse( '$array . 1 . 0 . 1 . 0' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( ctx.array[ 1 ][ 0 ][ 1 ][ 0 ] ) ;
+
+			parsed = Expression.parse( '$array . 1 . 0 . 1 . 0 . 0' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( 2 ) ;
+
+			parsed = Expression.parse( '$array . ( 3 - 2 )' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( ctx.array[ 1 ] ) ;
 		} ) ;
 
 		it( "parse/exec the spread operator" , () => {
