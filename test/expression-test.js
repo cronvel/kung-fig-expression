@@ -1200,7 +1200,7 @@ describe( "Expression" , () => {
 			expect( Expression.parse( '$my.var - 1' ).stringify() ).to.be( '$my.var - 1' ) ;
 			expect( Expression.parse( '! $my.var' ).stringify() ).to.be( '! $my.var' ) ;
 			expect( Expression.parse( '$my.var is-real?' ).stringify() ).to.be( '$my.var is-real?' ) ;
-			expect( Expression.parse( '"some" . "concat" . "string"' ).stringify() ).to.be( '"some" . "concat" . "string"' ) ;
+			expect( Expression.parse( '"some" .. "concat" .. "string"' ).stringify() ).to.be( '"some" .. "concat" .. "string"' ) ;
 			expect( Expression.parse( '[]' ).stringify() ).to.be( '[]' ) ;
 			expect( Expression.parse( '[ "value1" ]' ).stringify() ).to.be( '[ "value1" ]' ) ;
 			expect( Expression.parse( '[ "value1" , "value2" ]' ).stringify() ).to.be( '[ "value1" , "value2" ]' ) ;
@@ -1212,6 +1212,58 @@ describe( "Expression" , () => {
 		it( "stringify an expression with sub-expression" , () => {
 			expect( Expression.parse( '1 + ( 2 * 3 )' ).stringify() ).to.be( '1 + ( 2 * 3 )' ) ;
 			expect( Expression.parse( '1 + ( 2 * ( exp 3 ) )' ).stringify() ).to.be( '1 + ( 2 * ( exp( 3 ) ) )' ) ;
+		} ) ;
+	} ) ;
+
+
+
+	describe( ".toJs()" , () => {
+
+		it( "transform to JS a simple expression" , () => {
+			expect( Expression.parse( 'true && true' ).toJs() ).to.be( 'true && true' ) ;
+			expect( Expression.parse( 'true || false' ).toJs() ).to.be( 'true || false' ) ;
+			expect( Expression.parse( 'null and false' ).toJs() ).to.be( 'fnOperator.and( null , false )' ) ;
+			expect( Expression.parse( 'NaN or Infinity' ).toJs() ).to.be( 'fnOperator.or( NaN , Infinity )' ) ;
+			expect( Expression.parse( 'Infinity or -Infinity' ).toJs() ).to.be( 'fnOperator.or( Infinity , -Infinity )' ) ;
+			expect( Expression.parse( '( e * pi ) + phi' ).toJs() ).to.be( '( 2.718281828459045 * 3.141592653589793 ) + 1.618033988749895' ) ;
+			expect( Expression.parse( '1 + 2' ).toJs() ).to.be( '1 + 2' ) ;
+			expect( Expression.parse( 'add 1 2' ).toJs() ).to.be( '1 + 2' ) ;
+			expect( Expression.parse( 'add 1 2 3' ).toJs() ).to.be( '1 + 2 + 3' ) ;
+			expect( Expression.parse( 'max 1 2 3' ).toJs() ).to.be( 'fnOperator.max( 1 , 2 , 3 )' ) ;
+			expect( Expression.parse( '$my.var - 1' ).toJs() ).to.be( 'ctx.my.var - 1' ) ;
+			expect( Expression.parse( '! $my.var' ).toJs() ).to.be( '! ctx.my.var' ) ;
+			expect( Expression.parse( '$my.var is-real?' ).toJs() ).to.be( 'fnOperator["is-real?"]( ctx.my.var )' ) ;
+			expect( Expression.parse( '"some" .. "concat" .. "string"' ).toJs() ).to.be( '"some" + "concat" + "string"' ) ;
+			expect( Expression.parse( '[]' ).toJs() ).to.be( '[]' ) ;
+			expect( Expression.parse( '[ "value1" ]' ).toJs() ).to.be( '[ "value1" ]' ) ;
+			expect( Expression.parse( '[ "value1" , "value2" ]' ).toJs() ).to.be( '[ "value1" , "value2" ]' ) ;
+			expect( Expression.parse( '{}' ).toJs() ).to.be( '{}' ) ;
+			expect( Expression.parse( '{ "key1": "value1" }' ).toJs() ).to.be( '{ "key1": "value1" }' ) ;
+			expect( Expression.parse( '{ "key1": "value1" , "key2": "value2" }' ).toJs() ).to.be( '{ "key1": "value1" , "key2": "value2" }' ) ;
+		} ) ;
+		
+		it( "transform to JS an expression with object navigation" , () => {
+			expect( Expression.parse( '$var . ( "one" .. "two" ) . "three"' ).toJs() ).to.be( 'ctx.var[( "one" + "two" )]["three"]' ) ;
+		} ) ;
+		
+		it( "transform to JS an expression with a ternary operator" , () => {
+			expect( Expression.parse( '$var ? "one" "two"' ).toJs() ).to.be( 'ctx.var ? "one" : "two"' ) ;
+		} ) ;
+		
+		it( "transform to JS an expression with a call operator" , () => {
+			expect( Expression.parse( '$var ->' ).toJs() ).to.be( 'ctx.var()' ) ;
+			expect( Expression.parse( '$var -> "one"' ).toJs() ).to.be( 'ctx.var( "one" )' ) ;
+			expect( Expression.parse( '$var -> "one" "two"' ).toJs() ).to.be( 'ctx.var( "one" , "two" )' ) ;
+			expect( Expression.parse( '$var -> "one" "two" 3' ).toJs() ).to.be( 'ctx.var( "one" , "two" , 3 )' ) ;
+		} ) ;
+		
+		it.next( "transform to JS an expression with a spread operator" , () => {
+			expect( Expression.parse( 'max( ... $array )' ).toJs() ).to.be( 'fnOperator.max( ... ctx.array )' ) ;
+		} ) ;
+		
+		it( "transform to JS an expression with sub-expression" , () => {
+			expect( Expression.parse( '1 + ( 2 * 3 )' ).toJs() ).to.be( '1 + ( 2 * 3 )' ) ;
+			expect( Expression.parse( '1 + ( 2 * ( exp 3 ) )' ).toJs() ).to.be( '1 + ( 2 * ( fnOperator.exp( 3 ) ) )' ) ;
 		} ) ;
 	} ) ;
 
