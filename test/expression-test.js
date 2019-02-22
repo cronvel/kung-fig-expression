@@ -1246,6 +1246,8 @@ describe( "Expression" , () => {
 			expect( Expression.parse( '{}' ).toJs() ).to.be( '{}' ) ;
 			expect( Expression.parse( '{ "key1": "value1" }' ).toJs() ).to.be( '{ "key1": "value1" }' ) ;
 			expect( Expression.parse( '{ "key1": "value1" , "key2": "value2" }' ).toJs() ).to.be( '{ "key1": "value1" , "key2": "value2" }' ) ;
+			expect( Expression.parse( 'min( 1 , 2 , 3 )' ).toJs() ).to.be( 'op.min( 1 , 2 , 3 )' ) ;
+			expect( Expression.parse( 'min( 1 , 2 , 0 )' ).toJs() ).to.be( 'op.min( 1 , 2 , 0 )' ) ;
 		} ) ;
 
 		it( "transform to JS an expression with object navigation" , () => {
@@ -1411,6 +1413,11 @@ describe( "Expression" , () => {
 			parsed = Expression.parse( 'add ( 1 , 2 * 3 , 4 / 2 )' ) ;
 			//deb( parsed ) ;
 			expect( parsed.getFinalValue() ).to.equal( 9 ) ;
+		} ) ;
+		
+		it( "parser and falsy values filtered out" , () => {
+			expect( Expression.parse( 'min( 1 , 0 , 2 )' ).args ).to.equal( [ 1 , 0 , 2 ] ) ;
+			expect( Expression.parse( 'min( 1 , 2 , 0 )' ).args ).to.equal( [ 1 , 2 , 0 ] ) ;
 		} ) ;
 	} ) ;
 } ) ;
