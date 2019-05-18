@@ -1419,7 +1419,20 @@ describe( "Expression" , () => {
 			expect( Expression.parse( 'min( 1 , 0 , 2 )' ).args ).to.equal( [ 1 , 0 , 2 ] ) ;
 			expect( Expression.parse( 'min( 1 , 2 , 0 )' ).args ).to.equal( [ 1 , 2 , 0 ] ) ;
 		} ) ;
+
+		it( "Stack constructor with only one argument bug" , () => {
+			expect( new Expression.Stack() ).to.be.like( [] ) ;
+			expect( new Expression.Stack( 1 ) ).to.be.like( [ 1 ] ) ;
+			expect( new Expression.Stack( 1.2 ) ).to.be.like( [ 1.2 ] ) ;
+			expect( new Expression.Stack( 1 , 2 , 3 ) ).to.be.like( [ 1 , 2 , 3 ] ) ;
+
+			expect( new Expression.Stack( 1 ) ).to.be.an( Array ) ;
+			expect( new Expression.Stack( 1.2 ) ).to.be.an( Array ) ;
+			expect( new Expression.Stack( 1 ) ).to.be.a( Expression.Stack ) ;
+			expect( new Expression.Stack( 1.2 ) ).to.be.a( Expression.Stack ) ;
+			expect( new Expression.Stack( 1 ) ).to.have.a.length.of( 1 ) ;
+			expect( new Expression.Stack( 1.2 ) ).to.have.a.length.of( 1 ) ;
+		} ) ;
 	} ) ;
 } ) ;
-
 
