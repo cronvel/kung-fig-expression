@@ -776,6 +776,22 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( false ) ;
 		} ) ;
 
+		it( "parse/exec null coalescing" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( '$a.b.c ?? "default"' ) ;
+			expect( parsed.getFinalValue( {} ) ).to.be( 'default' ) ;
+			expect( parsed.getFinalValue( { a: {} } ) ).to.be( 'default' ) ;
+			expect( parsed.getFinalValue( { a: { b: {} } } ) ).to.be( 'default' ) ;
+			expect( parsed.getFinalValue( { a: { b: { c: 'value' } } } ) ).to.be( 'value' ) ;
+			expect( parsed.getFinalValue( { a: { b: { c: 0 } } } ) ).to.be( 0 ) ;
+			expect( parsed.getFinalValue( { a: { b: { c: false } } } ) ).to.be( false ) ;
+			expect( parsed.getFinalValue( { a: { b: { c: '' } } } ) ).to.be( '' ) ;
+			expect( parsed.getFinalValue( { a: { b: { c: [] } } } ) ).to.equal( [] ) ;
+			expect( parsed.getFinalValue( { a: { b: { c: null } } } ) ).to.be( 'default' ) ;
+			expect( parsed.getFinalValue( { a: { b: { c: undefined } } } ) ).to.be( 'default' ) ;
+		} ) ;
+
 		it( "parse/exec three-way" , () => {
 			var parsed ;
 
@@ -958,6 +974,24 @@ describe( "Expression" , () => {
 
 			parsed = Expression.parse( '( array 0 ) is-empty?' ) ;
 			expect( parsed.getFinalValue() ).to.be( false ) ;
+
+			parsed = Expression.parse( '$v is-empty?' ) ;
+			expect( parsed.getFinalValue( { v: undefined } ) ).to.be( true ) ;
+			expect( parsed.getFinalValue( { v: null } ) ).to.be( true ) ;
+			expect( parsed.getFinalValue( { v: false } ) ).to.be( true ) ;
+			expect( parsed.getFinalValue( { v: true } ) ).to.be( false ) ;
+			expect( parsed.getFinalValue( { v: 0 } ) ).to.be( true ) ;
+			expect( parsed.getFinalValue( { v: 1 } ) ).to.be( false ) ;
+			expect( parsed.getFinalValue( { v: '' } ) ).to.be( true ) ;
+			expect( parsed.getFinalValue( { v: 'bob' } ) ).to.be( false ) ;
+			expect( parsed.getFinalValue( { v: [] } ) ).to.be( true ) ;
+			expect( parsed.getFinalValue( { v: [1,2,3] } ) ).to.be( false ) ;
+			expect( parsed.getFinalValue( { v: {} } ) ).to.be( true ) ;
+			expect( parsed.getFinalValue( { v: {a:1,b:2} } ) ).to.be( false ) ;
+			expect( parsed.getFinalValue( { v: new Set() } ) ).to.be( true ) ;
+			expect( parsed.getFinalValue( { v: new Set([1,2,3]) } ) ).to.be( false ) ;
+			expect( parsed.getFinalValue( { v: new Map() } ) ).to.be( true ) ;
+			expect( parsed.getFinalValue( { v: new Map([['a',1],['b',2]]) } ) ).to.be( false ) ;
 
 			// Ternary mode
 			parsed = Expression.parse( '0 is-empty? "empty"' ) ;
