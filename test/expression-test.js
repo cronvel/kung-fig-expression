@@ -805,6 +805,30 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( 5 ) ;
 		} ) ;
 
+		it( "parse/exec int (cast) operator" , () => {
+			var parsed = Expression.parse( 'int $a' ) ;
+
+			expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( 3 ) ;
+			expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( 3 ) ;
+			expect( parsed.getFinalValue( { a: "3.2e2" } ) ).to.be( 320 ) ;
+			expect( parsed.getFinalValue( { a: "aaa" } ) ).to.be( NaN ) ;
+			expect( parsed.getFinalValue( { a: 3.7 } ) ).to.be( 4 ) ;
+			expect( parsed.getFinalValue( { a: Infinity } ) ).to.be( NaN ) ;
+			expect( parsed.getFinalValue( { a: NaN } ) ).to.be( NaN ) ;
+		} ) ;
+
+		it( "parse/exec float (cast) operator" , () => {
+			var parsed = Expression.parse( 'float $a' ) ;
+
+			expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( 3.2 ) ;
+			expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( 3.2 ) ;
+			expect( parsed.getFinalValue( { a: "3.2e2" } ) ).to.be( 320 ) ;
+			expect( parsed.getFinalValue( { a: "aaa" } ) ).to.be( NaN ) ;
+			expect( parsed.getFinalValue( { a: 3.7 } ) ).to.be( 3.7 ) ;
+			expect( parsed.getFinalValue( { a: Infinity } ) ).to.be( Infinity ) ;
+			expect( parsed.getFinalValue( { a: NaN } ) ).to.be( NaN ) ;
+		} ) ;
+
 		it( "parse/exec round/floor/ceil operator" , () => {
 			var parsed ;
 
