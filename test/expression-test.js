@@ -682,6 +682,27 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( "falseone2threetrue" ) ;
 		} ) ;
 
+		it( "parse/exec trim operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( 'trim " one  "' ) ;
+			expect( parsed.getFinalValue() ).to.be( "one" ) ;
+		} ) ;
+
+		it( "parse/exec lower-case operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( 'lower-case "aZerTy"' ) ;
+			expect( parsed.getFinalValue() ).to.be( "azerty" ) ;
+		} ) ;
+
+		it( "parse/exec upper-case operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( 'upper-case "aZerTy"' ) ;
+			expect( parsed.getFinalValue() ).to.be( "AZERTY" ) ;
+		} ) ;
+
 		it( "parse/exec concat operator" , () => {
 			var parsed ;
 
@@ -803,6 +824,16 @@ describe( "Expression" , () => {
 
 			parsed = Expression.parse( '0 ??? 4 5 6' ) ;
 			expect( parsed.getFinalValue() ).to.be( 5 ) ;
+		} ) ;
+
+		it( "parse/exec string (cast) operator" , () => {
+			var parsed = Expression.parse( 'string $a' ) ;
+
+			expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( "3.2" ) ;
+			expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( "3.2" ) ;
+			expect( parsed.getFinalValue( { a: "aaa" } ) ).to.be( "aaa" ) ;
+			expect( parsed.getFinalValue( { a: Infinity } ) ).to.be( "Infinity" ) ;
+			expect( parsed.getFinalValue( { a: NaN } ) ).to.be( "NaN" ) ;
 		} ) ;
 
 		it( "parse/exec int (cast) operator" , () => {
