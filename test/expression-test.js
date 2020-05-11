@@ -254,6 +254,9 @@ describe( "Expression" , () => {
 
 			parsed = Expression.parse( 'array(1,2,3,4)5' ) ;
 			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 , 4 , 5 ] ) ;
+
+			parsed = Expression.parse( 'lower-case (trim $local.a)' ) ;
+			expect( parsed.getFinalValue( { local: { a: "  aZErTy " } } ) ).to.be( "azerty" ) ;
 		} ) ;
 	} ) ;
 
@@ -689,6 +692,13 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( "one" ) ;
 		} ) ;
 
+		it( "parse/exec itrim operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( 'itrim "  one two  three   four  "' ) ;
+			expect( parsed.getFinalValue() ).to.be( "one two three four" ) ;
+		} ) ;
+
 		it( "parse/exec lower-case operator" , () => {
 			var parsed ;
 
@@ -702,7 +712,6 @@ describe( "Expression" , () => {
 			parsed = Expression.parse( 'upper-case "aZerTy"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "AZERTY" ) ;
 		} ) ;
-
 		it( "parse/exec concat operator" , () => {
 			var parsed ;
 
