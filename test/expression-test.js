@@ -685,11 +685,17 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( "falseone2threetrue" ) ;
 		} ) ;
 
-		it( "parse/exec trim operator" , () => {
+		it( "parse/exec trim/ltrim/rtrim operator" , () => {
 			var parsed ;
 
 			parsed = Expression.parse( 'trim " one  "' ) ;
 			expect( parsed.getFinalValue() ).to.be( "one" ) ;
+
+			parsed = Expression.parse( 'ltrim " one  "' ) ;
+			expect( parsed.getFinalValue() ).to.be( "one  " ) ;
+
+			parsed = Expression.parse( 'rtrim " one  "' ) ;
+			expect( parsed.getFinalValue() ).to.be( " one" ) ;
 		} ) ;
 
 		it( "parse/exec itrim operator" , () => {
@@ -697,6 +703,127 @@ describe( "Expression" , () => {
 
 			parsed = Expression.parse( 'itrim "  one two  three   four  "' ) ;
 			expect( parsed.getFinalValue() ).to.be( "one two three four" ) ;
+		} ) ;
+
+		it( "parse/exec starts-with operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( '"azerty" starts-with "az"' ) ;
+			expect( parsed.getFinalValue() ).to.be( true ) ;
+
+			parsed = Expression.parse( '"azerty" starts-with "zer"' ) ;
+			expect( parsed.getFinalValue() ).to.be( false ) ;
+		} ) ;
+
+		it( "parse/exec ends-with operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( '"azerty" ends-with "ty"' ) ;
+			expect( parsed.getFinalValue() ).to.be( true ) ;
+
+			parsed = Expression.parse( '"azerty" ends-with "zer"' ) ;
+			expect( parsed.getFinalValue() ).to.be( false ) ;
+		} ) ;
+
+		it( "parse/exec pad-start/pad-end operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( '"azerty" pad-start 3' ) ;
+			expect( parsed.getFinalValue() ).to.be( 'azerty' ) ;
+
+			parsed = Expression.parse( '"azerty" pad-start 6' ) ;
+			expect( parsed.getFinalValue() ).to.be( 'azerty' ) ;
+
+			parsed = Expression.parse( '"azerty" pad-start 9' ) ;
+			expect( parsed.getFinalValue() ).to.be( '   azerty' ) ;
+
+			parsed = Expression.parse( '"azerty" pad-start 9 "-+"' ) ;
+			expect( parsed.getFinalValue() ).to.be( '-+-azerty' ) ;
+
+			parsed = Expression.parse( '"azerty" pad-end 3' ) ;
+			expect( parsed.getFinalValue() ).to.be( 'azerty' ) ;
+
+			parsed = Expression.parse( '"azerty" pad-end 6' ) ;
+			expect( parsed.getFinalValue() ).to.be( 'azerty' ) ;
+
+			parsed = Expression.parse( '"azerty" pad-end 9' ) ;
+			expect( parsed.getFinalValue() ).to.be( 'azerty   ' ) ;
+
+			parsed = Expression.parse( '"azerty" pad-end 9 "-+"' ) ;
+			expect( parsed.getFinalValue() ).to.be( 'azerty-+-' ) ;
+		} ) ;
+
+		it( "parse/exec slice operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( '"azerty" slice 2' ) ;
+			expect( parsed.getFinalValue() ).to.be( 'erty' ) ;
+
+			parsed = Expression.parse( '"azerty" slice 2 4' ) ;
+			expect( parsed.getFinalValue() ).to.be( 'er' ) ;
+
+			parsed = Expression.parse( '"azerty" slice -2' ) ;
+			expect( parsed.getFinalValue() ).to.be( 'ty' ) ;
+		} ) ;
+
+		it( "parse/exec includes operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( '"azerty" includes "zer"' ) ;
+			expect( parsed.getFinalValue() ).to.be( true ) ;
+
+			parsed = Expression.parse( '"azerty" includes "rez"' ) ;
+			expect( parsed.getFinalValue() ).to.be( false ) ;
+
+			parsed = Expression.parse( '"azerty" includes "zer" 1' ) ;
+			expect( parsed.getFinalValue() ).to.be( true ) ;
+
+			parsed = Expression.parse( '"azerty" includes "zer" 2' ) ;
+			expect( parsed.getFinalValue() ).to.be( false ) ;
+		} ) ;
+
+		it( "parse/exec index-of operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( '"azerty" index-of "zer"' ) ;
+			expect( parsed.getFinalValue() ).to.be( 1 ) ;
+
+			parsed = Expression.parse( '"azerty" index-of "rez"' ) ;
+			expect( parsed.getFinalValue() ).to.be( -1 ) ;
+
+			parsed = Expression.parse( '"azerty" index-of "zer" 1' ) ;
+			expect( parsed.getFinalValue() ).to.be( 1 ) ;
+
+			parsed = Expression.parse( '"azerty" index-of "zer" 2' ) ;
+			expect( parsed.getFinalValue() ).to.be( -1 ) ;
+
+			parsed = Expression.parse( '"azerzerty" index-of "zer"' ) ;
+			expect( parsed.getFinalValue() ).to.be( 1 ) ;
+
+			parsed = Expression.parse( '"azerzerty" index-of "zer" 2' ) ;
+			expect( parsed.getFinalValue() ).to.be( 4 ) ;
+		} ) ;
+
+		it( "parse/exec last-index-of operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( '"azerty" last-index-of "zer"' ) ;
+			expect( parsed.getFinalValue() ).to.be( 1 ) ;
+
+			parsed = Expression.parse( '"azerty" last-index-of "rez"' ) ;
+			expect( parsed.getFinalValue() ).to.be( -1 ) ;
+
+			parsed = Expression.parse( '"azerty" last-index-of "zer" 1' ) ;
+			expect( parsed.getFinalValue() ).to.be( 1 ) ;
+
+			parsed = Expression.parse( '"azerty" last-index-of "zer" 2' ) ;
+			expect( parsed.getFinalValue() ).to.be( 1 ) ;
+
+			parsed = Expression.parse( '"azerzerty" last-index-of "zer"' ) ;
+			expect( parsed.getFinalValue() ).to.be( 4 ) ;
+
+			parsed = Expression.parse( '"azerzerty" last-index-of "zer" 2' ) ;
+			expect( parsed.getFinalValue() ).to.be( 1 ) ;
 		} ) ;
 
 		it( "parse/exec to-lower-case operator" , () => {
@@ -712,6 +839,7 @@ describe( "Expression" , () => {
 			parsed = Expression.parse( 'to-upper-case "aZerTy"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "AZERTY" ) ;
 		} ) ;
+
 		it( "parse/exec concat operator" , () => {
 			var parsed ;
 
