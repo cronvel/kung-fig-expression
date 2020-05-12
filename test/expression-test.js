@@ -255,7 +255,7 @@ describe( "Expression" , () => {
 			parsed = Expression.parse( 'array(1,2,3,4)5' ) ;
 			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 , 4 , 5 ] ) ;
 
-			parsed = Expression.parse( 'lower-case (trim $local.a)' ) ;
+			parsed = Expression.parse( 'to-lower-case (trim $local.a)' ) ;
 			expect( parsed.getFinalValue( { local: { a: "  aZErTy " } } ) ).to.be( "azerty" ) ;
 		} ) ;
 	} ) ;
@@ -699,17 +699,17 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( "one two three four" ) ;
 		} ) ;
 
-		it( "parse/exec lower-case operator" , () => {
+		it( "parse/exec to-lower-case operator" , () => {
 			var parsed ;
 
-			parsed = Expression.parse( 'lower-case "aZerTy"' ) ;
+			parsed = Expression.parse( 'to-lower-case "aZerTy"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "azerty" ) ;
 		} ) ;
 
-		it( "parse/exec upper-case operator" , () => {
+		it( "parse/exec to-upper-case operator" , () => {
 			var parsed ;
 
-			parsed = Expression.parse( 'upper-case "aZerTy"' ) ;
+			parsed = Expression.parse( 'to-upper-case "aZerTy"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "AZERTY" ) ;
 		} ) ;
 		it( "parse/exec concat operator" , () => {
