@@ -1487,6 +1487,12 @@ describe( "Expression" , () => {
 			expect( Expression.parse( 'starts-with 12.34 "start"' ).toJs() ).to.be( "( '' + 12.34 ).startsWith( \"start\" )" ) ;
 
 			expect( Expression.parse( 'includes $my.str $my.var 12' ).toJs() ).to.be( "( '' + ctx.my.str ).includes( ctx.my.var , 12 )" ) ;
+
+			expect( Expression.parse( 'slice $my.str 2 4' ).toJs() ).to.be( "( '' + ctx.my.str ).slice( 2 , 4 )" ) ;
+			expect( Expression.parse( 'slice "some string" 2 4' ).toJs() ).to.be( '"some string".slice( 2 , 4 )' ) ;
+
+			expect( Expression.parse( 'to-upper-case $my.str' ).toJs() ).to.be( "( '' + ctx.my.str ).toUpperCase()" ) ;
+			expect( Expression.parse( 'to-upper-case "bob"' ).toJs() ).to.be( '"bob".toUpperCase()' ) ;
 		} ) ;
 		
 		it( "transform to JS an expression with object navigation" , () => {
