@@ -6,7 +6,7 @@ module.exports = {
 		'node': true
 	} ,
 	'parserOptions': {
-		'ecmaVersion': 2018
+		'ecmaVersion': 2020
 	} ,
 	'extends': [ 'eslint:recommended' ] ,
 	'rules': {
@@ -60,6 +60,7 @@ module.exports = {
 		'indent': [ 'error' , 'tab' , {
 			'SwitchCase': 1 ,
 			'MemberExpression': 1 ,
+			'flatTernaryExpressions': true
 		} ] ,
 		'newline-per-chained-call': [ 'error', {
 			'ignoreChainWithDepth': 2 
