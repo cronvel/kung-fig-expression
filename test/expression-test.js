@@ -1464,7 +1464,6 @@ describe( "Expression" , () => {
 			expect( Expression.parse( 'max 1 2 3' ).toJs() ).to.be( 'Math.max( 1 , 2 , 3 )' ) ;
 			expect( Expression.parse( '$my.var - 1' ).toJs() ).to.be( 'ctx.my.var - 1' ) ;
 			expect( Expression.parse( '! $my.var' ).toJs() ).to.be( '! ctx.my.var' ) ;
-			expect( Expression.parse( '$my.var is-real?' ).toJs() ).to.be( 'op["is-real?"]( ctx.my.var )' ) ;
 			expect( Expression.parse( '"some" .. "concat" .. "string"' ).toJs() ).to.be( '"some" + "concat" + "string"' ) ;
 			expect( Expression.parse( '[]' ).toJs() ).to.be( '[]' ) ;
 			expect( Expression.parse( '[ "value1" ]' ).toJs() ).to.be( '[ "value1" ]' ) ;
@@ -1474,6 +1473,10 @@ describe( "Expression" , () => {
 			expect( Expression.parse( '{ "key1": "value1" , "key2": "value2" }' ).toJs() ).to.be( '{ "key1": "value1" , "key2": "value2" }' ) ;
 			expect( Expression.parse( 'min( 1 , 2 , 3 )' ).toJs() ).to.be( 'Math.min( 1 , 2 , 3 )' ) ;
 			expect( Expression.parse( 'min( 1 , 2 , 0 )' ).toJs() ).to.be( 'Math.min( 1 , 2 , 0 )' ) ;
+			
+			// Operators with a fancy funciton name
+			expect( Expression.parse( '$my.var is-real?' ).toJs() ).to.be( 'op["is-real?"]( ctx.my.var )' ) ;
+			expect( Expression.parse( '$a.b.c ?? "default"' ).toJs() ).to.be( 'op["??"]( ctx.a.b.c , "default" )' ) ;
 		} ) ;
 
 		it( "transform to JS using native JS function" , () => {
