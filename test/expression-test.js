@@ -897,6 +897,25 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue( ctx ) ).to.be( 4 ) ;
 		} ) ;
 
+		it( "parse/exec lerp" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( 'lerp 10 110 0' ) ;
+			expect( parsed.getFinalValue() ).to.be( 10 ) ;
+
+			parsed = Expression.parse( 'lerp 10 110 0.5' ) ;
+			expect( parsed.getFinalValue() ).to.be( 60 ) ;
+
+			parsed = Expression.parse( 'lerp 10 110 1' ) ;
+			expect( parsed.getFinalValue() ).to.be( 110 ) ;
+
+			parsed = Expression.parse( 'lerp 10 110 0.2' ) ;
+			expect( parsed.getFinalValue() ).to.be( 30 ) ;
+
+			parsed = Expression.parse( 'lerp 10 110 0.95' ) ;
+			expect( parsed.getFinalValue() ).to.be( 105 ) ;
+		} ) ;
+
 		it( "parse/exec the '%=' (around) operator" , () => {
 			var parsed ;
 
