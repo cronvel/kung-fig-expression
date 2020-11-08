@@ -1517,6 +1517,12 @@ describe( "Expression" , () => {
 			expect( Expression.parse( 'to-upper-case "bob"' ).toJs() ).to.be( '"bob".toUpperCase()' ) ;
 		} ) ;
 		
+		it( "transform to JS custom operators using native JS function" , () => {
+			var operators = { inv: x => 1 / x } ;
+			operators.inv.id = 'inv' ;
+			expect( Expression.parse( 'inv 2' , operators ).toJs() ).to.be( 'op.inv( 2 )' ) ;
+		} ) ;
+
 		it( "transform to JS an expression with object navigation" , () => {
 			expect( Expression.parse( '$var . ( "one" .. "two" ) . "three"' ).toJs() ).to.be( 'ctx.var["one" + "two"]["three"]' ) ;
 		} ) ;
