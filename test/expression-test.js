@@ -257,6 +257,9 @@ describe( "Expression" , () => {
 
 			parsed = Expression.parse( 'to-lower-case (trim $local.a)' ) ;
 			expect( parsed.getFinalValue( { local: { a: "  aZErTy " } } ) ).to.be( "azerty" ) ;
+
+			parsed = Expression.parse( 'to-lower-case(trim $local.a)' ) ;
+			expect( parsed.getFinalValue( { local: { a: "  aZErTy " } } ) ).to.be( "azerty" ) ;
 		} ) ;
 	} ) ;
 
