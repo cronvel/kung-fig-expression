@@ -1139,6 +1139,28 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( "bad" ) ;
 		} ) ;
 
+		it( "parse/exec the merge operator" , () => {
+			var parsed , ctx , object ;
+
+			parsed = Expression.parse( 'merge( {"a":1,"b":2} , {"b":3,"c":4} )' ) ;
+			expect( parsed.getFinalValue() ).to.equal( {a:1,b:3,c:4} ) ;
+
+			// Should not modify existing object, but create a new one
+			object = {b:3,c:4} ;
+			ctx = { v: object } ;
+			parsed = Expression.parse( 'merge( {"a":1,"b":2} , $v )' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.equal( {a:1,b:3,c:4} ) ;
+			expect( ctx.v ).to.equal( {b:3,c:4} ) ;
+			expect( ctx.v ).to.be( object ) ;
+			expect( parsed.getFinalValue( ctx ) ).not.to.be( object ) ;
+
+			parsed = Expression.parse( 'merge( $v , {"a":1,"b":2} )' ) ;
+			expect( parsed.getFinalValue( ctx ) ).to.equal( {a:1,b:2,c:4} ) ;
+			expect( ctx.v ).to.equal( {b:3,c:4} ) ;
+			expect( ctx.v ).to.be( object ) ;
+			expect( parsed.getFinalValue( ctx ) ).not.to.be( object ) ;
+		} ) ;
+
 		it( "parse/exec is-set? operators" , () => {
 			var parsed ;
 
