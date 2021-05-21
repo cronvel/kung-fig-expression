@@ -1455,6 +1455,18 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue( ctx ) ).to.be( 14 ) ;
 
 		} ) ;
+
+		it( "parse/exec unit operators" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( '180 deg' ) ;
+			expect( parsed.getFinalValue() ).to.be( Math.PI ) ;
+			parsed = Expression.parse( '360 °' ) ;
+			expect( parsed.getFinalValue() ).to.be( 2 * Math.PI ) ;
+
+			parsed = Expression.parse( '10 °C' ) ;
+			expect( parsed.getFinalValue() ).to.be( 283.15 ) ;
+		} ) ;
 	} ) ;
 
 
@@ -1602,6 +1614,8 @@ describe( "Expression" , () => {
 			expect( Expression.parse( '{}' ).compile()( context ) ).to.equal( {} ) ;
 			expect( Expression.parse( '{ "key1": "value1" }' ).compile()( context ) ).to.equal( { "key1": "value1" } ) ;
 			expect( Expression.parse( '{ "key1": "value1" , "key2": "value2" }' ).compile()( context ) ).to.equal( { "key1": "value1" , "key2": "value2" } ) ;
+
+			expect( Expression.parse( '12 °C' ).compile()( context ) ).to.be( 285.15 ) ;
 		} ) ;
 
 		it( "compile an expression with object navigation" , () => {
