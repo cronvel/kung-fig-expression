@@ -1665,6 +1665,52 @@ describe( "Expression" , () => {
 
 
 
+	describe( "Clone" , () => {
+
+		it( "clone expression" , () => {
+			var parsed , parsed2 , ctx ;
+
+			parsed = Expression.parse( '1 + ( 2 + 3 )' ) ;
+			parsed2 = parsed.clone() ;
+			expect( parsed.getFinalValue() ).to.be( 6 ) ;
+			expect( parsed2.getFinalValue() ).to.be( 6 ) ;
+
+			parsed = Expression.parse( 'array 1 2 3' ) ;
+			parsed2 = parsed.clone() ;
+			expect( parsed.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
+			expect( parsed2.getFinalValue() ).to.equal( [ 1 , 2 , 3 ] ) ;
+
+			parsed = Expression.parse( '[ 1 , [[2 + 3]] ]' ) ;
+			parsed2 = parsed.clone() ;
+			expect( parsed.getFinalValue() ).to.equal( [ 1 , [ [ 5 ] ] ] ) ;
+			expect( parsed2.getFinalValue() ).to.equal( [ 1 , [ [ 5 ] ] ] ) ;
+
+			parsed = Expression.parse( 'object( key1: "value1", key2  :2 )' ) ;
+			parsed2 = parsed.clone() ;
+			expect( parsed.getFinalValue() ).to.equal( { key1: 'value1' , key2: 2 } ) ;
+			expect( parsed2.getFinalValue() ).to.equal( { key1: 'value1' , key2: 2 } ) ;
+			expect( parsed.args ).not.to.be( parsed2.args ) ;
+			expect( parsed.args[ 0 ] ).not.to.be( parsed2.args[ 0 ] ) ;
+			expect( parsed.args[ 1 ] ).not.to.be( parsed2.args[ 1 ] ) ;
+
+			ctx = {
+				object: {
+					path: { to: { nested: { property: "value" } } }
+				} ,
+				array: [ 0 , [ [ 1 , [ [ 2 ] ] ] ] ]
+			} ;
+
+			parsed = Expression.parse( '$object . "path" . "to"' ) ;
+			parsed2 = parsed.clone() ;
+			expect( parsed.getFinalValue( ctx ) ).to.be( ctx.object.path.to ) ;
+			expect( parsed2.getFinalValue( ctx ) ).to.be( ctx.object.path.to ) ;
+			expect( parsed.args[ 0 ] ).not.to.be( parsed2.args[ 0 ] ) ;
+			expect( parsed.args[ 1 ] ).to.be( parsed2.args[ 1 ] ) ;
+		} ) ;
+	} ) ;
+
+
+
 	describe( "Historical bugs" , () => {
 
 		// may check object multi-reference too
