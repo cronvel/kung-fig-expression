@@ -1518,8 +1518,8 @@ describe( "Expression" , () => {
 			expect( Expression.parse( 'add 1 2' ).toJs() ).to.be( '1 + 2' ) ;
 			expect( Expression.parse( 'add 1 2 3' ).toJs() ).to.be( '1 + 2 + 3' ) ;
 			expect( Expression.parse( 'max 1 2 3' ).toJs() ).to.be( 'Math.max( 1 , 2 , 3 )' ) ;
-			expect( Expression.parse( '$my.var - 1' ).toJs() ).to.be( 'ctx.my.var - 1' ) ;
-			expect( Expression.parse( '! $my.var' ).toJs() ).to.be( '! ctx.my.var' ) ;
+			expect( Expression.parse( '$my.var - 1' ).toJs() ).to.be( 'ctx?.my?.var - 1' ) ;
+			expect( Expression.parse( '! $my.var' ).toJs() ).to.be( '! ctx?.my?.var' ) ;
 			expect( Expression.parse( '"some" .. "concat" .. "string"' ).toJs() ).to.be( '"some" + "concat" + "string"' ) ;
 			expect( Expression.parse( '[]' ).toJs() ).to.be( '[]' ) ;
 			expect( Expression.parse( '[ "value1" ]' ).toJs() ).to.be( '[ "value1" ]' ) ;
@@ -1530,27 +1530,27 @@ describe( "Expression" , () => {
 			expect( Expression.parse( 'min( 1 , 2 , 3 )' ).toJs() ).to.be( 'Math.min( 1 , 2 , 3 )' ) ;
 			expect( Expression.parse( 'min( 1 , 2 , 0 )' ).toJs() ).to.be( 'Math.min( 1 , 2 , 0 )' ) ;
 			
-			// Operators with a fancy funciton name
-			expect( Expression.parse( '$my.var is-real?' ).toJs() ).to.be( 'op["is-real?"]( ctx.my.var )' ) ;
-			expect( Expression.parse( '$a.b.c ?? "default"' ).toJs() ).to.be( 'op["??"]( ctx.a.b.c , "default" )' ) ;
+			// Operators with a fancy function name
+			expect( Expression.parse( '$my.var is-real?' ).toJs() ).to.be( 'op["is-real?"]( ctx?.my?.var )' ) ;
+			expect( Expression.parse( '$a.b.c ?? "default"' ).toJs() ).to.be( 'op["??"]( ctx?.a?.b?.c , "default" )' ) ;
 		} ) ;
 
 		it( "transform to JS using native JS function" , () => {
-			expect( Expression.parse( 'sin $my.var' ).toJs() ).to.be( 'Math.sin( ctx.my.var )' ) ;
+			expect( Expression.parse( 'sin $my.var' ).toJs() ).to.be( 'Math.sin( ctx?.my?.var )' ) ;
 		} ) ;
 		
 		it( "transform to JS using native JS method" , () => {
-			expect( Expression.parse( 'starts-with $my.str $my.var' ).toJs() ).to.be( "( '' + ctx.my.str ).startsWith( ctx.my.var )" ) ;
-			expect( Expression.parse( 'starts-with $my.str "start"' ).toJs() ).to.be( "( '' + ctx.my.str ).startsWith( \"start\" )" ) ;
-			expect( Expression.parse( 'starts-with "string" $my.str' ).toJs() ).to.be( '"string".startsWith( ctx.my.str )' ) ;
+			expect( Expression.parse( 'starts-with $my.str $my.var' ).toJs() ).to.be( "( '' + ctx?.my?.str ).startsWith( ctx?.my?.var )" ) ;
+			expect( Expression.parse( 'starts-with $my.str "start"' ).toJs() ).to.be( "( '' + ctx?.my?.str ).startsWith( \"start\" )" ) ;
+			expect( Expression.parse( 'starts-with "string" $my.str' ).toJs() ).to.be( '"string".startsWith( ctx?.my?.str )' ) ;
 			expect( Expression.parse( 'starts-with 12.34 "start"' ).toJs() ).to.be( "( '' + 12.34 ).startsWith( \"start\" )" ) ;
 
-			expect( Expression.parse( 'includes $my.str $my.var 12' ).toJs() ).to.be( "( '' + ctx.my.str ).includes( ctx.my.var , 12 )" ) ;
+			expect( Expression.parse( 'includes $my.str $my.var 12' ).toJs() ).to.be( "( '' + ctx?.my?.str ).includes( ctx?.my?.var , 12 )" ) ;
 
-			expect( Expression.parse( 'slice $my.str 2 4' ).toJs() ).to.be( "( '' + ctx.my.str ).slice( 2 , 4 )" ) ;
+			expect( Expression.parse( 'slice $my.str 2 4' ).toJs() ).to.be( "( '' + ctx?.my?.str ).slice( 2 , 4 )" ) ;
 			expect( Expression.parse( 'slice "some string" 2 4' ).toJs() ).to.be( '"some string".slice( 2 , 4 )' ) ;
 
-			expect( Expression.parse( 'to-upper-case $my.str' ).toJs() ).to.be( "( '' + ctx.my.str ).toUpperCase()" ) ;
+			expect( Expression.parse( 'to-upper-case $my.str' ).toJs() ).to.be( "( '' + ctx?.my?.str ).toUpperCase()" ) ;
 			expect( Expression.parse( 'to-upper-case "bob"' ).toJs() ).to.be( '"bob".toUpperCase()' ) ;
 		} ) ;
 		
@@ -1561,22 +1561,22 @@ describe( "Expression" , () => {
 		} ) ;
 
 		it( "transform to JS an expression with object navigation" , () => {
-			expect( Expression.parse( '$var . ( "one" .. "two" ) . "three"' ).toJs() ).to.be( 'ctx.var["one" + "two"]["three"]' ) ;
+			expect( Expression.parse( '$var . ( "one" .. "two" ) . "three"' ).toJs() ).to.be( 'ctx?.var["one" + "two"]["three"]' ) ;
 		} ) ;
 
 		it( "transform to JS an expression with a ternary operator" , () => {
-			expect( Expression.parse( '$var ? "one" "two"' ).toJs() ).to.be( 'ctx.var ? "one" : "two"' ) ;
+			expect( Expression.parse( '$var ? "one" "two"' ).toJs() ).to.be( 'ctx?.var ? "one" : "two"' ) ;
 		} ) ;
 
 		it( "transform to JS an expression with a call operator" , () => {
-			expect( Expression.parse( '$var ->' ).toJs() ).to.be( 'ctx.var()' ) ;
-			expect( Expression.parse( '$var -> "one"' ).toJs() ).to.be( 'ctx.var( "one" )' ) ;
-			expect( Expression.parse( '$var -> "one" "two"' ).toJs() ).to.be( 'ctx.var( "one" , "two" )' ) ;
-			expect( Expression.parse( '$var -> "one" "two" 3' ).toJs() ).to.be( 'ctx.var( "one" , "two" , 3 )' ) ;
+			expect( Expression.parse( '$var ->' ).toJs() ).to.be( 'ctx?.var()' ) ;
+			expect( Expression.parse( '$var -> "one"' ).toJs() ).to.be( 'ctx?.var( "one" )' ) ;
+			expect( Expression.parse( '$var -> "one" "two"' ).toJs() ).to.be( 'ctx?.var( "one" , "two" )' ) ;
+			expect( Expression.parse( '$var -> "one" "two" 3' ).toJs() ).to.be( 'ctx?.var( "one" , "two" , 3 )' ) ;
 		} ) ;
 
 		it( "transform to JS an expression with a spread operator" , () => {
-			expect( Expression.parse( 'max( ... $array )' ).toJs() ).to.be( 'Math.max( ... ctx.array )' ) ;
+			expect( Expression.parse( 'max( ... $array )' ).toJs() ).to.be( 'Math.max( ... ctx?.array )' ) ;
 		} ) ;
 
 		it( "transform to JS an expression with sub-expression" , () => {
