@@ -1563,10 +1563,10 @@ describe( "Expression" , () => {
 			expect( Expression.parse( '{ "key1": "value1" , "key2": "value2" }' ).toJs() ).to.be( '{ "key1": "value1" , "key2": "value2" }' ) ;
 			expect( Expression.parse( 'min( 1 , 2 , 3 )' ).toJs() ).to.be( 'Math.min( 1 , 2 , 3 )' ) ;
 			expect( Expression.parse( 'min( 1 , 2 , 0 )' ).toJs() ).to.be( 'Math.min( 1 , 2 , 0 )' ) ;
+			expect( Expression.parse( '$a.b.c ?? "default"' ).toJs() ).to.be( 'ctx?.a?.b?.c ?? "default"' ) ;
 			
 			// Operators with a fancy function name
 			expect( Expression.parse( '$my.var is-real?' ).toJs() ).to.be( 'op["is-real?"]( ctx?.my?.var )' ) ;
-			expect( Expression.parse( '$a.b.c ?? "default"' ).toJs() ).to.be( 'op["??"]( ctx?.a?.b?.c , "default" )' ) ;
 		} ) ;
 
 		it( "transform to JS using native JS function" , () => {
@@ -1595,11 +1595,17 @@ describe( "Expression" , () => {
 		} ) ;
 
 		it( "transform to JS an expression with object navigation" , () => {
-			expect( Expression.parse( '$var . ( "one" .. "two" ) . "three"' ).toJs() ).to.be( 'ctx?.var["one" + "two"]["three"]' ) ;
+			expect( Expression.parse( '$var . ( "one" .. "two" ) . "three"' ).toJs() ).to.be( 'ctx?.var?.["one" + "two"]?.["three"]' ) ;
 		} ) ;
 
 		it( "transform to JS an expression with a ternary operator" , () => {
+			expect( Expression.parse( '$var ?' ).toJs() ).to.be( '!! ctx?.var' ) ;
+			expect( Expression.parse( '$var ? "one"' ).toJs() ).to.be( 'ctx?.var ? "one" : false' ) ;
 			expect( Expression.parse( '$var ? "one" "two"' ).toJs() ).to.be( 'ctx?.var ? "one" : "two"' ) ;
+			expect( Expression.parse( '$var ? "one" ; "two"' ).toJs() ).to.be( 'ctx?.var ? "one" : "two"' ) ;
+			expect( Expression.parse( '$var ? "one" ; $var2 ? "two"' ).toJs() ).to.be( 'ctx?.var ? "one" : ctx?.var2 ? "two" : false' ) ;
+			expect( Expression.parse( '$var ? "one" ; $var2 ? "two" ; "three"' ).toJs() ).to.be( 'ctx?.var ? "one" : ctx?.var2 ? "two" : "three"' ) ;
+			expect( Expression.parse( '$var ? "one" ; $var2 ? "two" ; $var3 ? "three" ; "four"' ).toJs() ).to.be( 'ctx?.var ? "one" : ctx?.var2 ? "two" : ctx?.var3 ? "three" : "four"' ) ;
 		} ) ;
 
 		it( "transform to JS an expression with a call operator" , () => {
