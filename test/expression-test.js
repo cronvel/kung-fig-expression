@@ -75,6 +75,18 @@ describe( "Expression" , () => {
 			parsed = Expression.parse( '1 + Infinity' ) ;
 			expect( parsed.getFinalValue() ).to.be( Infinity ) ;
 		} ) ;
+		
+		it( "parsing a single constant without operators should return that constant instead of an Expression" , () => {
+			expect( Expression.parse( 'null' ) ).to.be( null ) ;
+			expect( Expression.parse( 'yes' ) ).to.be( true ) ;
+			expect( Expression.parse( 'Infinity' ) ).to.be( Infinity ) ;
+			expect( Expression.parse( '10' ) ).to.be( 10 ) ;
+			expect( Expression.parse( '+10' ) ).to.be( 10 ) ;
+			expect( Expression.parse( '-10' ) ).to.be( -10 ) ;
+			expect( Expression.parse( '10%' ) ).to.be( 0.1 ) ;
+			expect( Expression.parse( '+10%' ) ).to.be( 1.1 ) ;
+			expect( Expression.parse( '-10%' ) ).to.be( 0.9 ) ;
+		} ) ;
 
 		it( "parse/exec a simple expression of expression" , () => {
 			var parsed ;
@@ -1114,19 +1126,19 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( true ) ;
 
 			// True ternary mode
-			parsed = Expression.parse( '0 ? "great" "bad"' ) ;
+			parsed = Expression.parse( '0 ? "great" ; "bad"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "bad" ) ;
 
-			parsed = Expression.parse( '1 ? "great" "bad"' ) ;
+			parsed = Expression.parse( '1 ? "great" ; "bad"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "great" ) ;
 
-			parsed = Expression.parse( 'null ? "great" "bad"' ) ;
+			parsed = Expression.parse( 'null ? "great" ; "bad"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "bad" ) ;
 
-			parsed = Expression.parse( 'false ? "great" "bad"' ) ;
+			parsed = Expression.parse( 'false ? "great" ; "bad"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "bad" ) ;
 
-			parsed = Expression.parse( 'true ? "great" "bad"' ) ;
+			parsed = Expression.parse( 'true ? "great" ; "bad"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "great" ) ;
 
 			parsed = Expression.parse( '"" ? "great" "bad"' ) ;
@@ -1137,6 +1149,28 @@ describe( "Expression" , () => {
 
 			parsed = Expression.parse( '$unknown ? "great" "bad"' ) ;
 			expect( parsed.getFinalValue() ).to.be( "bad" ) ;
+		} ) ;
+
+		it( "zzz parse/exec the switch-case-like  '?' ternary operators" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( 'true ? "great" , "bad"' ) ;
+			expect( parsed.getFinalValue() ).to.be( "great" ) ;
+
+			parsed = Expression.parse( 'false ? "great" ; "bad"' ) ;
+			expect( parsed.getFinalValue() ).to.be( "bad" ) ;
+
+			parsed = Expression.parse( 'true ? 1 ; true ? 2 ; false ? 3 ; 4' ) ;
+			expect( parsed.getFinalValue() ).to.be( 1 ) ;
+
+			parsed = Expression.parse( 'false ? 1 ; true ? 2 ; false ? 3 ; 4' ) ;
+			expect( parsed.getFinalValue() ).to.be( 2 ) ;
+
+			parsed = Expression.parse( 'false ? 1 ; false ? 2 ; true ? 3 ; 4' ) ;
+			expect( parsed.getFinalValue() ).to.be( 3 ) ;
+
+			parsed = Expression.parse( 'false ? 1 ; false ? 2 ; false ? 3 ; 4' ) ;
+			expect( parsed.getFinalValue() ).to.be( 4 ) ;
 		} ) ;
 
 		it( "parse/exec the merge operator" , () => {
