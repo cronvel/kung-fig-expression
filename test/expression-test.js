@@ -894,6 +894,25 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( 7.0710678118654755 ) ;
 		} ) ;
 
+		it( "parse/exec clamp" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( 'clamp 4 ; 5 ; 7' ) ;
+			expect( parsed.getFinalValue() ).to.be( 5 ) ;
+
+			parsed = Expression.parse( 'clamp 5 ; 5 ; 7' ) ;
+			expect( parsed.getFinalValue() ).to.be( 5 ) ;
+
+			parsed = Expression.parse( 'clamp 6 ; 5 ; 7' ) ;
+			expect( parsed.getFinalValue() ).to.be( 6 ) ;
+
+			parsed = Expression.parse( 'clamp 7 ; 5 ; 7' ) ;
+			expect( parsed.getFinalValue() ).to.be( 7 ) ;
+
+			parsed = Expression.parse( 'clamp 8 ; 5 ; 7' ) ;
+			expect( parsed.getFinalValue() ).to.be( 7 ) ;
+		} ) ;
+
 		it( "parse/exec avg" , () => {
 			var parsed ;
 
