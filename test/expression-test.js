@@ -428,7 +428,7 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( true ) ;
 		} ) ;
 
-		it( "parse/exec the greater than '>=' operator" , () => {
+		it( "parse/exec the greater than or equal '>=' operator" , () => {
 			var parsed ;
 
 			parsed = Expression.parse( '3 >= 4' ) ;
@@ -453,7 +453,7 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( true ) ;
 		} ) ;
 
-		it( "parse/exec the greater than '<' operator" , () => {
+		it( "parse/exec the lesser than '<' operator" , () => {
 			var parsed ;
 
 			parsed = Expression.parse( '3 < 4' ) ;
@@ -478,7 +478,7 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( true ) ;
 		} ) ;
 
-		it( "parse/exec the greater than '<=' operator" , () => {
+		it( "parse/exec the lesser than or equal '<=' operator" , () => {
 			var parsed ;
 
 			parsed = Expression.parse( '3 <= 4' ) ;
@@ -503,7 +503,7 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( true ) ;
 		} ) ;
 
-		it( "parse/exec the greater than '=' operator" , () => {
+		it( "parse/exec the equal '=' operator" , () => {
 			var parsed ;
 
 			parsed = Expression.parse( '3 = 4' ) ;
@@ -519,7 +519,7 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( true ) ;
 		} ) ;
 
-		it( "parse/exec the greater than '!=' operator" , () => {
+		it( "parse/exec the not equal '!=' operator" , () => {
 			var parsed ;
 
 			parsed = Expression.parse( '3 != 4' ) ;
@@ -539,6 +539,34 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( true ) ;
 
 			parsed = Expression.parse( '4 != 3 != 4' ) ;
+			expect( parsed.getFinalValue() ).to.be( true ) ;
+		} ) ;
+
+		it( "parse/exec the is one of multiple alternative 'is-one-of' operator" , () => {
+			var parsed ;
+
+			parsed = Expression.parse( '3 is-one-of 4' ) ;
+			expect( parsed.getFinalValue() ).to.be( false ) ;
+
+			parsed = Expression.parse( '3 is-one-of 3' ) ;
+			expect( parsed.getFinalValue() ).to.be( true ) ;
+
+			parsed = Expression.parse( '3 is-one-of 3 4' ) ;
+			expect( parsed.getFinalValue() ).to.be( true ) ;
+
+			parsed = Expression.parse( '3 is-one-of 4 3' ) ;
+			expect( parsed.getFinalValue() ).to.be( true ) ;
+
+			parsed = Expression.parse( '3 is-one-of 4 5' ) ;
+			expect( parsed.getFinalValue() ).to.be( false ) ;
+
+			parsed = Expression.parse( '3 is-one-of 4 5 6 7' ) ;
+			expect( parsed.getFinalValue() ).to.be( false ) ;
+
+			parsed = Expression.parse( '3 is-one-of 4 ; 5 ; 6 ; 7' ) ;
+			expect( parsed.getFinalValue() ).to.be( false ) ;
+
+			parsed = Expression.parse( '3 is-one-of 4 ; 5 ; 6 ; 3 ; 7' ) ;
 			expect( parsed.getFinalValue() ).to.be( true ) ;
 		} ) ;
 
