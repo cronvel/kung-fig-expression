@@ -1750,7 +1750,11 @@ describe( "Expression" , () => {
 		} ) ;
 
 		it( "compile an expression using userland operators" , () => {
-			var operators = {} ;
+			var expression , operators = {} ;
+			
+			expression = Expression.parse( '3 + 4 + 5' , operators ) ;
+			expect( expression.xop ).to.be( undefined ) ;
+			
 			operators.bob = ( ... args ) => 'bob' + args.join( 'bob' ) ;
 			operators.bob.id = 'bob' ;
 
@@ -1758,7 +1762,9 @@ describe( "Expression" , () => {
 				my: { 'var': 7 }
 			} ;
 
-			expect( Expression.parse( 'bob "a" "b" "c"' , operators ).compile()( context ) ).to.be( "bobabobbbobc" ) ;
+			expression = Expression.parse( 'bob "a" "b" "c"' , operators ) ;
+			expect( expression.xop ).to.be( operators ) ;
+			expect( expression.compile()( context ) ).to.be( "bobabobbbobc" ) ;
 		} ) ;
 	} ) ;
 
