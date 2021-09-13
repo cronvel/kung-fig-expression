@@ -1638,7 +1638,7 @@ describe( "Expression" , () => {
 		it( "transform to JS custom operators using native JS function" , () => {
 			var operators = { inv: x => 1 / x } ;
 			operators.inv.id = 'inv' ;
-			expect( Expression.parse( 'inv 2' , operators ).toJs() ).to.be( 'op.inv( 2 )' ) ;
+			expect( Expression.parse( 'inv 2' , operators ).toJs() ).to.be( 'xop.inv( 2 )' ) ;
 		} ) ;
 
 		it( "transform to JS an expression with object navigation" , () => {
@@ -1747,6 +1747,18 @@ describe( "Expression" , () => {
 
 			expect( Expression.parse( '1 + ( 2 * 3 )' ).compile()( context ) ).to.be( 7 ) ;
 			expect( Expression.parse( '1 + ( 2 * ( exp 3 ) )' ).compile()( context ) ).to.be( 41.171073846375336 ) ;
+		} ) ;
+
+		it( "compile an expression using userland operators" , () => {
+			var operators = {} ;
+			operators.bob = ( ... args ) => 'bob' + args.join( 'bob' ) ;
+			operators.bob.id = 'bob' ;
+
+			var context = {
+				my: { 'var': 7 }
+			} ;
+
+			expect( Expression.parse( 'bob "a" "b" "c"' , operators ).compile()( context ) ).to.be( "bobabobbbobc" ) ;
 		} ) ;
 	} ) ;
 
