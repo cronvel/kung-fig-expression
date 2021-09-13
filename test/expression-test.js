@@ -1753,7 +1753,7 @@ describe( "Expression" , () => {
 			var expression , operators = {} ;
 			
 			expression = Expression.parse( '3 + 4 + 5' , operators ) ;
-			expect( expression.xop ).to.be( undefined ) ;
+			expect( expression.xop ).to.be( null ) ;
 			
 			operators.bob = ( ... args ) => 'bob' + args.join( 'bob' ) ;
 			operators.bob.id = 'bob' ;
