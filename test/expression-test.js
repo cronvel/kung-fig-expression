@@ -1044,8 +1044,8 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( 5 ) ;
 		} ) ;
 
-		it( "parse/exec string (cast) operator" , () => {
-			var parsed = Expression.parse( 'string $a' ) ;
+		it( "parse/exec <string> (cast) operator" , () => {
+			var parsed = Expression.parse( '<string> $a' ) ;
 
 			expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( "3.2" ) ;
 			expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( "3.2" ) ;
@@ -1054,8 +1054,8 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue( { a: NaN } ) ).to.be( "NaN" ) ;
 		} ) ;
 
-		it( "parse/exec int (cast) operator" , () => {
-			var parsed = Expression.parse( 'int $a' ) ;
+		it( "parse/exec <int> (cast) operator" , () => {
+			var parsed = Expression.parse( '<int> $a' ) ;
 
 			expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( 3 ) ;
 			expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( 3 ) ;
@@ -1066,8 +1066,8 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue( { a: NaN } ) ).to.be( NaN ) ;
 		} ) ;
 
-		it( "parse/exec float (cast) operator" , () => {
-			var parsed = Expression.parse( 'float $a' ) ;
+		it( "parse/exec <float> (cast) operator" , () => {
+			var parsed = Expression.parse( '<float> $a' ) ;
 
 			expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( 3.2 ) ;
 			expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( 3.2 ) ;
@@ -1076,6 +1076,27 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue( { a: 3.7 } ) ).to.be( 3.7 ) ;
 			expect( parsed.getFinalValue( { a: Infinity } ) ).to.be( Infinity ) ;
 			expect( parsed.getFinalValue( { a: NaN } ) ).to.be( NaN ) ;
+		} ) ;
+
+		it( "parse/exec <array> (cast) operator" , () => {
+			var value ,
+				parsed = Expression.parse( '<array> $a' ) ;
+
+			expect( parsed.getFinalValue( {} ) ).to.equal( [] ) ;
+			expect( parsed.getFinalValue( { a: null } ) ).to.equal( [] ) ;
+			expect( parsed.getFinalValue( { a: true } ) ).to.equal( [ true ] ) ;
+			expect( parsed.getFinalValue( { a: false } ) ).to.equal( [ false ] ) ;
+			expect( parsed.getFinalValue( { a: 3.2 } ) ).to.equal( [ 3.2 ] ) ;
+			expect( parsed.getFinalValue( { a: "Alice" } ) ).to.equal( [ 'A' , 'l' , 'i' , 'c' , 'e' ] ) ;
+			expect( parsed.getFinalValue( { a: { a: 1 , b: 2 } } ) ).to.equal( [ { a: 1 , b: 2 } ] ) ;
+
+			value = parsed.getFinalValue( { a: [ 2 , 3 , 4 , "bob" , true ] } ) ;
+			expect( value ).to.be.an( Array ) ;
+			expect( value ).to.equal( [ 2 , 3 , 4 , "bob" , true ] ) ;
+
+			value = parsed.getFinalValue( { a: new Set( [ 2 , 3 , 4 , "bob" , true ] ) } ) ;
+			expect( value ).to.be.an( Array ) ;
+			expect( value ).to.equal( [ 2 , 3 , 4 , "bob" , true ] ) ;
 		} ) ;
 
 		it( "parse/exec round/floor/ceil operator" , () => {
