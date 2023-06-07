@@ -76,7 +76,7 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( Infinity ) ;
 		} ) ;
 		
-		it( "parsing a single constant without operators should return that constant instead of an Expression" , () => {
+		it( "parsing a single constant without operator should return that constant instead of an Expression" , () => {
 			expect( Expression.parse( 'null' ) ).to.be( null ) ;
 			expect( Expression.parse( 'yes' ) ).to.be( true ) ;
 			expect( Expression.parse( 'Infinity' ) ).to.be( Infinity ) ;
@@ -1044,61 +1044,6 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( 5 ) ;
 		} ) ;
 
-		it( "parse/exec <string> (cast) operator" , () => {
-			var parsed = Expression.parse( '<string> $a' ) ;
-
-			expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( "3.2" ) ;
-			expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( "3.2" ) ;
-			expect( parsed.getFinalValue( { a: "aaa" } ) ).to.be( "aaa" ) ;
-			expect( parsed.getFinalValue( { a: Infinity } ) ).to.be( "Infinity" ) ;
-			expect( parsed.getFinalValue( { a: NaN } ) ).to.be( "NaN" ) ;
-		} ) ;
-
-		it( "parse/exec <int> (cast) operator" , () => {
-			var parsed = Expression.parse( '<int> $a' ) ;
-
-			expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( 3 ) ;
-			expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( 3 ) ;
-			expect( parsed.getFinalValue( { a: "3.2e2" } ) ).to.be( 320 ) ;
-			expect( parsed.getFinalValue( { a: "aaa" } ) ).to.be( NaN ) ;
-			expect( parsed.getFinalValue( { a: 3.7 } ) ).to.be( 4 ) ;
-			expect( parsed.getFinalValue( { a: Infinity } ) ).to.be( NaN ) ;
-			expect( parsed.getFinalValue( { a: NaN } ) ).to.be( NaN ) ;
-		} ) ;
-
-		it( "parse/exec <float> (cast) operator" , () => {
-			var parsed = Expression.parse( '<float> $a' ) ;
-
-			expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( 3.2 ) ;
-			expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( 3.2 ) ;
-			expect( parsed.getFinalValue( { a: "3.2e2" } ) ).to.be( 320 ) ;
-			expect( parsed.getFinalValue( { a: "aaa" } ) ).to.be( NaN ) ;
-			expect( parsed.getFinalValue( { a: 3.7 } ) ).to.be( 3.7 ) ;
-			expect( parsed.getFinalValue( { a: Infinity } ) ).to.be( Infinity ) ;
-			expect( parsed.getFinalValue( { a: NaN } ) ).to.be( NaN ) ;
-		} ) ;
-
-		it( "parse/exec <array> (cast) operator" , () => {
-			var value ,
-				parsed = Expression.parse( '<array> $a' ) ;
-
-			expect( parsed.getFinalValue( {} ) ).to.equal( [] ) ;
-			expect( parsed.getFinalValue( { a: null } ) ).to.equal( [] ) ;
-			expect( parsed.getFinalValue( { a: true } ) ).to.equal( [ true ] ) ;
-			expect( parsed.getFinalValue( { a: false } ) ).to.equal( [ false ] ) ;
-			expect( parsed.getFinalValue( { a: 3.2 } ) ).to.equal( [ 3.2 ] ) ;
-			expect( parsed.getFinalValue( { a: "Alice" } ) ).to.equal( [ 'A' , 'l' , 'i' , 'c' , 'e' ] ) ;
-			expect( parsed.getFinalValue( { a: { a: 1 , b: 2 } } ) ).to.equal( [ { a: 1 , b: 2 } ] ) ;
-
-			value = parsed.getFinalValue( { a: [ 2 , 3 , 4 , "bob" , true ] } ) ;
-			expect( value ).to.be.an( Array ) ;
-			expect( value ).to.equal( [ 2 , 3 , 4 , "bob" , true ] ) ;
-
-			value = parsed.getFinalValue( { a: new Set( [ 2 , 3 , 4 , "bob" , true ] ) } ) ;
-			expect( value ).to.be.an( Array ) ;
-			expect( value ).to.equal( [ 2 , 3 , 4 , "bob" , true ] ) ;
-		} ) ;
-
 		it( "parse/exec round/floor/ceil operator" , () => {
 			var parsed ;
 
@@ -1184,7 +1129,7 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( 8 ) ;
 		} ) ;
 
-		it( "parse/exec the '?' ternary operators" , () => {
+		it( "parse/exec the '?' ternary operator" , () => {
 			var parsed ;
 
 			parsed = Expression.parse( '0 ?' ) ;
@@ -1219,7 +1164,7 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue() ).to.be( "bad" ) ;
 		} ) ;
 
-		it( "zzz parse/exec the switch-case-like  '?' ternary operators" , () => {
+		it( "parse/exec the switch-case-like  '?' ternary operator" , () => {
 			var parsed ;
 
 			parsed = Expression.parse( 'true ? "great" , "bad"' ) ;
@@ -1263,113 +1208,6 @@ describe( "Expression" , () => {
 			expect( parsed.getFinalValue( ctx ) ).not.to.be( object ) ;
 		} ) ;
 
-		it( "parse/exec is-set? operators" , () => {
-			var parsed ;
-
-			parsed = Expression.parse( '$unknown is-set?' ) ;
-			expect( parsed.getFinalValue() ).to.be( false ) ;
-
-			parsed = Expression.parse( '0 is-set?' ) ;
-			expect( parsed.getFinalValue() ).to.be( true ) ;
-
-			parsed = Expression.parse( '1 is-set?' ) ;
-			expect( parsed.getFinalValue() ).to.be( true ) ;
-
-			// Ternary mode
-			parsed = Expression.parse( '1 is-set? "great"' ) ;
-			expect( parsed.getFinalValue() ).to.be( "great" ) ;
-
-			parsed = Expression.parse( '1 is-set? "great" "bad"' ) ;
-			expect( parsed.getFinalValue() ).to.be( "great" ) ;
-
-			parsed = Expression.parse( '$unknown is-set? "great"' ) ;
-			expect( parsed.getFinalValue() ).to.be( false ) ;
-
-			parsed = Expression.parse( '$unknown is-set? "great" "bad"' ) ;
-			expect( parsed.getFinalValue() ).to.be( "bad" ) ;
-		} ) ;
-
-		it( "parse/exec is-empty? operators" , () => {
-			var parsed ;
-
-			parsed = Expression.parse( '$unknown is-empty?' ) ;
-			expect( parsed.getFinalValue() ).to.be( true ) ;
-
-			parsed = Expression.parse( '0 is-empty?' ) ;
-			expect( parsed.getFinalValue() ).to.be( true ) ;
-
-			parsed = Expression.parse( '1 is-empty?' ) ;
-			expect( parsed.getFinalValue() ).to.be( false ) ;
-
-			parsed = Expression.parse( '( array ) is-empty?' ) ;
-			expect( parsed.getFinalValue() ).to.be( true ) ;
-
-			parsed = Expression.parse( '( array 1 ) is-empty?' ) ;
-			expect( parsed.getFinalValue() ).to.be( false ) ;
-
-			parsed = Expression.parse( '( array 1 2 3 ) is-empty?' ) ;
-			expect( parsed.getFinalValue() ).to.be( false ) ;
-
-			parsed = Expression.parse( '( array 0 ) is-empty?' ) ;
-			expect( parsed.getFinalValue() ).to.be( false ) ;
-
-			parsed = Expression.parse( '$v is-empty?' ) ;
-			expect( parsed.getFinalValue( { v: undefined } ) ).to.be( true ) ;
-			expect( parsed.getFinalValue( { v: null } ) ).to.be( true ) ;
-			expect( parsed.getFinalValue( { v: false } ) ).to.be( true ) ;
-			expect( parsed.getFinalValue( { v: true } ) ).to.be( false ) ;
-			expect( parsed.getFinalValue( { v: 0 } ) ).to.be( true ) ;
-			expect( parsed.getFinalValue( { v: 1 } ) ).to.be( false ) ;
-			expect( parsed.getFinalValue( { v: '' } ) ).to.be( true ) ;
-			expect( parsed.getFinalValue( { v: 'bob' } ) ).to.be( false ) ;
-			expect( parsed.getFinalValue( { v: [] } ) ).to.be( true ) ;
-			expect( parsed.getFinalValue( { v: [1,2,3] } ) ).to.be( false ) ;
-			expect( parsed.getFinalValue( { v: {} } ) ).to.be( true ) ;
-			expect( parsed.getFinalValue( { v: {a:1,b:2} } ) ).to.be( false ) ;
-			expect( parsed.getFinalValue( { v: new Set() } ) ).to.be( true ) ;
-			expect( parsed.getFinalValue( { v: new Set([1,2,3]) } ) ).to.be( false ) ;
-			expect( parsed.getFinalValue( { v: new Map() } ) ).to.be( true ) ;
-			expect( parsed.getFinalValue( { v: new Map([['a',1],['b',2]]) } ) ).to.be( false ) ;
-
-			// Ternary mode
-			parsed = Expression.parse( '0 is-empty? "empty"' ) ;
-			expect( parsed.getFinalValue() ).to.be( "empty" ) ;
-
-			parsed = Expression.parse( '1 is-empty? "empty" "not-empty"' ) ;
-			expect( parsed.getFinalValue() ).to.be( "not-empty" ) ;
-		} ) ;
-
-		it( "parse/exec is-real? operators" , () => {
-			var parsed ;
-
-			parsed = Expression.parse( '0 is-real?' ) ;
-			expect( parsed.getFinalValue() ).to.be( true ) ;
-
-			parsed = Expression.parse( '1 is-real?' ) ;
-			expect( parsed.getFinalValue() ).to.be( true ) ;
-
-			parsed = Expression.parse( '1.5 is-real?' ) ;
-			expect( parsed.getFinalValue() ).to.be( true ) ;
-
-			parsed = Expression.parse( '-1.5 is-real?' ) ;
-			expect( parsed.getFinalValue() ).to.be( true ) ;
-
-			parsed = Expression.parse( '-1.5 is-real?' ) ;
-			expect( parsed.getFinalValue() ).to.be( true ) ;
-
-			parsed = Expression.parse( '( 1 / 0 ) is-real?' ) ;
-			expect( parsed.getFinalValue() ).to.be( false ) ;
-
-			parsed = Expression.parse( 'Infinity is-real?' ) ;
-			expect( parsed.getFinalValue() ).to.be( false ) ;
-
-			// Ternary mode
-			parsed = Expression.parse( '-1.5 is-real? "real"' ) ;
-			expect( parsed.getFinalValue() ).to.be( "real" ) ;
-
-			parsed = Expression.parse( '( 1 / 0 ) is-real? "real" "not-real"' ) ;
-			expect( parsed.getFinalValue() ).to.be( "not-real" ) ;
-		} ) ;
 
 		it( "parse/exec the 'pi'/π constant" , () => {
 			var parsed ;
@@ -1568,6 +1406,313 @@ describe( "Expression" , () => {
 
 			parsed = Expression.parse( '10 °C' ) ;
 			expect( parsed.getFinalValue() ).to.be( 283.15 ) ;
+		} ) ;
+
+		describe( "Cast" , () => {
+			it( "parse/exec <string> operator" , () => {
+				var parsed = Expression.parse( '<string> $a' ) ;
+
+				expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( "3.2" ) ;
+				expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( "3.2" ) ;
+				expect( parsed.getFinalValue( { a: "aaa" } ) ).to.be( "aaa" ) ;
+				expect( parsed.getFinalValue( { a: Infinity } ) ).to.be( "Infinity" ) ;
+				expect( parsed.getFinalValue( { a: NaN } ) ).to.be( "NaN" ) ;
+			} ) ;
+
+			it( "parse/exec <int> operator" , () => {
+				var parsed = Expression.parse( '<int> $a' ) ;
+
+				expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( 3 ) ;
+				expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( 3 ) ;
+				expect( parsed.getFinalValue( { a: "3.2e2" } ) ).to.be( 320 ) ;
+				expect( parsed.getFinalValue( { a: "aaa" } ) ).to.be( NaN ) ;
+				expect( parsed.getFinalValue( { a: 3.7 } ) ).to.be( 4 ) ;
+				expect( parsed.getFinalValue( { a: Infinity } ) ).to.be( NaN ) ;
+				expect( parsed.getFinalValue( { a: NaN } ) ).to.be( NaN ) ;
+			} ) ;
+
+			it( "parse/exec <float> operator" , () => {
+				var parsed = Expression.parse( '<float> $a' ) ;
+
+				expect( parsed.getFinalValue( { a: 3.2 } ) ).to.be( 3.2 ) ;
+				expect( parsed.getFinalValue( { a: "3.2" } ) ).to.be( 3.2 ) ;
+				expect( parsed.getFinalValue( { a: "3.2e2" } ) ).to.be( 320 ) ;
+				expect( parsed.getFinalValue( { a: "aaa" } ) ).to.be( NaN ) ;
+				expect( parsed.getFinalValue( { a: 3.7 } ) ).to.be( 3.7 ) ;
+				expect( parsed.getFinalValue( { a: Infinity } ) ).to.be( Infinity ) ;
+				expect( parsed.getFinalValue( { a: NaN } ) ).to.be( NaN ) ;
+			} ) ;
+
+			it( "parse/exec <array> operator" , () => {
+				var value ,
+					parsed = Expression.parse( '<array> $a' ) ;
+
+				expect( parsed.getFinalValue( {} ) ).to.equal( [] ) ;
+				expect( parsed.getFinalValue( { a: null } ) ).to.equal( [] ) ;
+				expect( parsed.getFinalValue( { a: true } ) ).to.equal( [ true ] ) ;
+				expect( parsed.getFinalValue( { a: false } ) ).to.equal( [ false ] ) ;
+				expect( parsed.getFinalValue( { a: 3.2 } ) ).to.equal( [ 3.2 ] ) ;
+				expect( parsed.getFinalValue( { a: "Alice" } ) ).to.equal( [ 'A' , 'l' , 'i' , 'c' , 'e' ] ) ;
+				expect( parsed.getFinalValue( { a: { a: 1 , b: 2 } } ) ).to.equal( [ { a: 1 , b: 2 } ] ) ;
+
+				value = parsed.getFinalValue( { a: [ 2 , 3 , 4 , "bob" , true ] } ) ;
+				expect( value ).to.be.an( Array ) ;
+				expect( value ).to.equal( [ 2 , 3 , 4 , "bob" , true ] ) ;
+
+				value = parsed.getFinalValue( { a: new Set( [ 2 , 3 , 4 , "bob" , true ] ) } ) ;
+				expect( value ).to.be.an( Array ) ;
+				expect( value ).to.equal( [ 2 , 3 , 4 , "bob" , true ] ) ;
+			} ) ;
+
+			it( "parse/exec <set> operator" , () => {
+				var value ,
+					parsed = Expression.parse( '<set> $a' ) ;
+
+				expect( parsed.getFinalValue( {} ) ).to.be.a( Set ) ;
+				expect( parsed.getFinalValue( {} ) ).to.be.empty() ;
+				expect( parsed.getFinalValue( { a: null } ) ).to.be.empty() ;
+				expect( parsed.getFinalValue( { a: true } ) ).to.only.contain( true ) ;
+				expect( parsed.getFinalValue( { a: false } ) ).to.only.contain( false ) ;
+				expect( parsed.getFinalValue( { a: 3.2 } ) ).to.only.contain( 3.2 ) ;
+				expect( parsed.getFinalValue( { a: "Alice" } ) ).to.only.contain( 'A' , 'l' , 'i' , 'c' , 'e' ) ;
+
+				value = parsed.getFinalValue( { a: [ 2 , 3 , 4 , "bob" , true ] } ) ;
+				expect( value ).to.be.an( Set ) ;
+				expect( value ).to.only.contain( 2 , 3 , 4 , "bob" , true ) ;
+
+				value = parsed.getFinalValue( { a: new Set( [ 2 , 3 , 4 , "bob" , true ] ) } ) ;
+				expect( value ).to.be.an( Set ) ;
+				expect( value ).to.only.contain( 2 , 3 , 4 , "bob" , true ) ;
+			} ) ;
+		} ) ;
+		
+		describe( "Type checkers" , () => {
+			it( "parse/exec is-set? operator" , () => {
+				var parsed ;
+
+				parsed = Expression.parse( '$unknown is-set?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '0 is-set?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '1 is-set?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				// Ternary mode
+				parsed = Expression.parse( '1 is-set? "great"' ) ;
+				expect( parsed.getFinalValue() ).to.be( "great" ) ;
+
+				parsed = Expression.parse( '1 is-set? "great" "bad"' ) ;
+				expect( parsed.getFinalValue() ).to.be( "great" ) ;
+
+				parsed = Expression.parse( '$unknown is-set? "great"' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '$unknown is-set? "great" "bad"' ) ;
+				expect( parsed.getFinalValue() ).to.be( "bad" ) ;
+			} ) ;
+
+			it( "parse/exec is-empty? operator" , () => {
+				var parsed ;
+
+				parsed = Expression.parse( '$unknown is-empty?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '0 is-empty?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '1 is-empty?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '( array ) is-empty?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '( array 1 ) is-empty?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '( array 1 2 3 ) is-empty?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '( array 0 ) is-empty?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '$v is-empty?' ) ;
+				expect( parsed.getFinalValue( { v: undefined } ) ).to.be( true ) ;
+				expect( parsed.getFinalValue( { v: null } ) ).to.be( true ) ;
+				expect( parsed.getFinalValue( { v: false } ) ).to.be( true ) ;
+				expect( parsed.getFinalValue( { v: true } ) ).to.be( false ) ;
+				expect( parsed.getFinalValue( { v: 0 } ) ).to.be( true ) ;
+				expect( parsed.getFinalValue( { v: 1 } ) ).to.be( false ) ;
+				expect( parsed.getFinalValue( { v: '' } ) ).to.be( true ) ;
+				expect( parsed.getFinalValue( { v: 'bob' } ) ).to.be( false ) ;
+				expect( parsed.getFinalValue( { v: [] } ) ).to.be( true ) ;
+				expect( parsed.getFinalValue( { v: [1,2,3] } ) ).to.be( false ) ;
+				expect( parsed.getFinalValue( { v: {} } ) ).to.be( true ) ;
+				expect( parsed.getFinalValue( { v: {a:1,b:2} } ) ).to.be( false ) ;
+				expect( parsed.getFinalValue( { v: new Set() } ) ).to.be( true ) ;
+				expect( parsed.getFinalValue( { v: new Set([1,2,3]) } ) ).to.be( false ) ;
+				expect( parsed.getFinalValue( { v: new Map() } ) ).to.be( true ) ;
+				expect( parsed.getFinalValue( { v: new Map([['a',1],['b',2]]) } ) ).to.be( false ) ;
+
+				// Ternary mode
+				parsed = Expression.parse( '0 is-empty? "empty"' ) ;
+				expect( parsed.getFinalValue() ).to.be( "empty" ) ;
+
+				parsed = Expression.parse( '1 is-empty? "empty" "not-empty"' ) ;
+				expect( parsed.getFinalValue() ).to.be( "not-empty" ) ;
+			} ) ;
+
+			it( "parse/exec is-int? operator" , () => {
+				var parsed ;
+
+				parsed = Expression.parse( '0 is-int?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '1 is-int?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '1.5 is-int?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '-1.5 is-int?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '12345 is-int?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '123.45 is-int?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '( 1 / 3 ) is-int?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '( 1 / 0 ) is-int?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( 'Infinity is-int?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				// Ternary mode
+				parsed = Expression.parse( '123 is-int? "int"' ) ;
+				expect( parsed.getFinalValue() ).to.be( "int" ) ;
+
+				parsed = Expression.parse( '123.45 is-int? "int" "not-int"' ) ;
+				expect( parsed.getFinalValue() ).to.be( "not-int" ) ;
+			} ) ;
+
+			it( "parse/exec is-real? operator" , () => {
+				var parsed ;
+
+				parsed = Expression.parse( '0 is-real?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '1 is-real?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '1.5 is-real?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '-1.5 is-real?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '12345 is-real?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '123.45 is-real?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '( 1 / 3 ) is-real?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '( 1 / 0 ) is-real?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( 'Infinity is-real?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				// Ternary mode
+				parsed = Expression.parse( '-1.5 is-real? "real"' ) ;
+				expect( parsed.getFinalValue() ).to.be( "real" ) ;
+
+				parsed = Expression.parse( '( 1 / 0 ) is-real? "real" "not-real"' ) ;
+				expect( parsed.getFinalValue() ).to.be( "not-real" ) ;
+			} ) ;
+
+			it( "parse/exec is-array? operator" , () => {
+				var parsed ;
+
+				parsed = Expression.parse( '0 is-array?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( 'null is-array?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '[] is-array?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '[ 1 , 2 ] is-array?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '( <Set> [] ) is-array?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '( <Set> [ 1 , 2 ] ) is-array?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '{ "a": 1 , "b": 2 } is-array?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+			} ) ;
+
+			it( "parse/exec is-object? operator" , () => {
+				var parsed ;
+
+				parsed = Expression.parse( '0 is-object?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( 'null is-object?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '{ "a": 1 , "b": 2 } is-object?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '[] is-object?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '[ 1 , 2 ] is-object?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '( <Set> [] ) is-object?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '( <Set> [ 1 , 2 ] ) is-object?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+			} ) ;
+
+			it( "parse/exec is-a-set? operator (check if it's a Set)" , () => {
+				var parsed ;
+
+				parsed = Expression.parse( '0 is-a-set?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( 'null is-a-set?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '[] is-a-set?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '[ 1 , 2 ] is-a-set?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+
+				parsed = Expression.parse( '( <Set> [] ) is-a-set?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '( <Set> [ 1 , 2 ] ) is-a-set?' ) ;
+				expect( parsed.getFinalValue() ).to.be( true ) ;
+
+				parsed = Expression.parse( '{ "a": 1 , "b": 2 } is-a-set?' ) ;
+				expect( parsed.getFinalValue() ).to.be( false ) ;
+			} ) ;
 		} ) ;
 	} ) ;
 
